@@ -23,18 +23,10 @@ fi
 
 echo "✅ Node.js version: $(node -v)"
 
-# Install Angular CLI globally if not present
-if ! command -v ng &> /dev/null; then
-    echo "📦 Installing Angular CLI globally..."
-    npm install -g @angular/cli@latest
-fi
-
-echo "✅ Angular CLI: $(ng version --minimal)"
-
-# Create Angular workspace
+# Create Angular workspace (using npx to avoid global install)
 echo ""
 echo "📦 Creating Angular workspace..."
-ng new frontend \
+npx @angular/cli@latest new frontend \
     --routing \
     --style=scss \
     --skip-git \
@@ -109,7 +101,7 @@ echo "1. Copy JSON configs from v3:"
 echo "   cp ../cca_senior_navigator_v3/products/gcp_v4/modules/care_recommendation/module.json src/assets/configs/gcp_module.json"
 echo ""
 echo "2. Start development server:"
-echo "   cd frontend && ng serve"
+echo "   cd frontend && npx ng serve"
 echo ""
 echo "3. Open browser:"
 echo "   http://localhost:4200"

@@ -1,0 +1,182 @@
+{
+  "version": "v2025.10",
+  "currency": "USD",
+  "updated_at_utc": "2025-10-12T00:00:00Z",
+
+  "categories": {
+    "no_care": { "label": "No Care Needed", "base_monthly_usd": 0 },
+    "assisted_living": { "label": "Assisted Living", "base_monthly_usd": 5500 },
+    "in_home_care": { "label": "In-Home Care", "base_monthly_usd": 5200 },
+    "memory_care": { "label": "Memory Care", "base_monthly_usd": 7200 },
+    "memory_care_high_acuity": { "label": "Memory Care (High Acuity)", "base_monthly_usd": 9000 }
+  },
+
+  "rules": {
+    "effective_monthly_cost": "base_monthly_usd * effective_multiplier",
+    "effective_multiplier_resolution_order": [
+      "zip_exact_wa",
+      "zip3_wa",
+      "state_wa",
+      "zip_exact",
+      "zip3",
+      "state",
+      "default"
+    ]
+  },
+
+  "zip_multipliers": {
+    "default": 1.00,
+
+    "by_zip_wa": [
+      { "zip": "98101", "multiplier": 1.15, "notes": "Seattle (Downtown/Core)" },
+      { "zip": "98103", "multiplier": 1.14, "notes": "Seattle (Green Lake/Wallingford)" },
+      { "zip": "98105", "multiplier": 1.14, "notes": "Seattle (U-District)" },
+      { "zip": "98109", "multiplier": 1.15, "notes": "Seattle (SLU/Queen Anne)" },
+      { "zip": "98004", "multiplier": 1.14, "notes": "Bellevue (Downtown)" },
+      { "zip": "98052", "multiplier": 1.12, "notes": "Redmond" },
+      { "zip": "98033", "multiplier": 1.12, "notes": "Kirkland" },
+      { "zip": "98402", "multiplier": 1.04, "notes": "Tacoma (Downtown)" },
+      { "zip": "98405", "multiplier": 1.04, "notes": "Tacoma (Central)" },
+      { "zip": "99201", "multiplier": 0.99, "notes": "Spokane (Downtown)" },
+      { "zip": "99223", "multiplier": 0.99, "notes": "Spokane (South Hill)" },
+      { "zip": "98661", "multiplier": 1.02, "notes": "Vancouver (Central)" },
+      { "zip": "98682", "multiplier": 1.02, "notes": "Vancouver (NE)" },
+      { "zip": "98201", "multiplier": 1.05, "notes": "Everett (Downtown)" },
+      { "zip": "98208", "multiplier": 1.05, "notes": "Everett (South)" },
+      { "zip": "98310", "multiplier": 1.03, "notes": "Bremerton" },
+      { "zip": "99301", "multiplier": 0.97, "notes": "Pasco" },
+      { "zip": "99336", "multiplier": 0.97, "notes": "Kennewick" },
+      { "zip": "99352", "multiplier": 0.97, "notes": "Richland" },
+      { "zip": "98501", "multiplier": 1.00, "notes": "Olympia" }
+    ],
+
+    "by_zip3_wa": [
+      { "zip3": "980", "multiplier": 1.12, "notes": "King/Eastside (Bellevue/Redmond/Kirkland/Issaquah)" },
+      { "zip3": "981", "multiplier": 1.15, "notes": "Seattle Core" },
+      { "zip3": "982", "multiplier": 1.05, "notes": "Snohomish/Skagit/Whatcom" },
+      { "zip3": "983", "multiplier": 1.03, "notes": "Kitsap/Peninsula" },
+      { "zip3": "984", "multiplier": 1.04, "notes": "Tacoma/Pierce" },
+      { "zip3": "985", "multiplier": 1.00, "notes": "Olympia/Thurston/Coastal SW" },
+      { "zip3": "986", "multiplier": 1.02, "notes": "Vancouver/Clark" },
+      { "zip3": "988", "multiplier": 0.98, "notes": "Wenatchee/Chelan/NCentral" },
+      { "zip3": "989", "multiplier": 0.94, "notes": "Yakima/Kittitas" },
+      { "zip3": "990", "multiplier": 0.98, "notes": "Spokane County (outer)" },
+      { "zip3": "991", "multiplier": 0.95, "notes": "Eastern rural (Whitman/Stevens et al.)" },
+      { "zip3": "992", "multiplier": 0.99, "notes": "Spokane (city)" },
+      { "zip3": "993", "multiplier": 0.97, "notes": "Tri-Cities/Walla Walla/SE WA" },
+      { "zip3": "994", "multiplier": 0.95, "notes": "Asotin/SE border" }
+    ],
+
+    "by_state_wa": [
+      { "state": "WA", "multiplier": 1.10 }
+    ],
+
+    "by_zip": [
+      { "zip": "10001", "multiplier": 1.40, "notes": "Manhattan, NY" },
+      { "zip": "94103", "multiplier": 1.35, "notes": "San Francisco, CA" },
+      { "zip": "90012", "multiplier": 1.25, "notes": "Los Angeles, CA" },
+      { "zip": "02108", "multiplier": 1.25, "notes": "Boston, MA" },
+      { "zip": "60601", "multiplier": 1.20, "notes": "Chicago, IL (Loop)" },
+      { "zip": "73301", "multiplier": 1.12, "notes": "Austin, TX (Gov/PO)" },
+      { "zip": "75201", "multiplier": 1.10, "notes": "Dallas, TX" },
+      { "zip": "85004", "multiplier": 1.05, "notes": "Phoenix, AZ" },
+      { "zip": "32202", "multiplier": 0.95, "notes": "Jacksonville, FL (DT)" },
+      { "zip": "35203", "multiplier": 0.90, "notes": "Birmingham, AL" }
+    ],
+
+    "by_zip3": [
+      { "zip3": "100", "multiplier": 1.35, "notes": "NYC core" },
+      { "zip3": "112", "multiplier": 1.28, "notes": "Brooklyn, NY" },
+      { "zip3": "070", "multiplier": 1.15, "notes": "NE New Jersey" },
+      { "zip3": "200", "multiplier": 1.22, "notes": "Washington, DC" },
+      { "zip3": "303", "multiplier": 1.08, "notes": "Atlanta, GA" },
+      { "zip3": "331", "multiplier": 1.18, "notes": "Miami, FL" },
+      { "zip3": "606", "multiplier": 1.15, "notes": "Chicago, IL" },
+      { "zip3": "733", "multiplier": 1.10, "notes": "Austin, TX (region)" },
+      { "zip3": "752", "multiplier": 1.08, "notes": "Dallas, TX" },
+      { "zip3": "850", "multiplier": 1.04, "notes": "Phoenix, AZ" },
+      { "zip3": "900", "multiplier": 1.22, "notes": "Los Angeles, CA" },
+      { "zip3": "941", "multiplier": 1.30, "notes": "San Francisco, CA" },
+      { "zip3": "972", "multiplier": 1.06, "notes": "Portland, OR" }
+    ],
+
+    "by_state": [
+      { "state": "AK", "multiplier": 1.18 },
+      { "state": "AL", "multiplier": 0.92 },
+      { "state": "AR", "multiplier": 0.90 },
+      { "state": "AZ", "multiplier": 1.02 },
+      { "state": "CA", "multiplier": 1.22 },
+      { "state": "CO", "multiplier": 1.10 },
+      { "state": "CT", "multiplier": 1.15 },
+      { "state": "DC", "multiplier": 1.22 },
+      { "state": "DE", "multiplier": 1.02 },
+      { "state": "FL", "multiplier": 1.05 },
+      { "state": "GA", "multiplier": 0.98 },
+      { "state": "HI", "multiplier": 1.25 },
+      { "state": "IA", "multiplier": 0.93 },
+      { "state": "ID", "multiplier": 0.98 },
+      { "state": "IL", "multiplier": 1.02 },
+      { "state": "IN", "multiplier": 0.95 },
+      { "state": "KS", "multiplier": 0.94 },
+      { "state": "KY", "multiplier": 0.93 },
+      { "state": "LA", "multiplier": 0.92 },
+      { "state": "MA", "multiplier": 1.18 },
+      { "state": "MD", "multiplier": 1.10 },
+      { "state": "ME", "multiplier": 1.02 },
+      { "state": "MI", "multiplier": 0.96 },
+      { "state": "MN", "multiplier": 1.02 },
+      { "state": "MO", "multiplier": 0.94 },
+      { "state": "MS", "multiplier": 0.88 },
+      { "state": "MT", "multiplier": 0.98 },
+      { "state": "NC", "multiplier": 0.98 },
+      { "state": "ND", "multiplier": 0.97 },
+      { "state": "NE", "multiplier": 0.95 },
+      { "state": "NH", "multiplier": 1.05 },
+      { "state": "NJ", "multiplier": 1.15 },
+      { "state": "NM", "multiplier": 0.95 },
+      { "state": "NV", "multiplier": 1.02 },
+      { "state": "NY", "multiplier": 1.20 },
+      { "state": "OH", "multiplier": 0.94 },
+      { "state": "OK", "multiplier": 0.92 },
+      { "state": "OR", "multiplier": 1.06 },
+      { "state": "PA", "multiplier": 0.99 },
+      { "state": "RI", "multiplier": 1.06 },
+      { "state": "SC", "multiplier": 0.97 },
+      { "state": "SD", "multiplier": 0.95 },
+      { "state": "TN", "multiplier": 0.96 },
+      { "state": "TX", "multiplier": 0.98 },
+      { "state": "UT", "multiplier": 1.00 },
+      { "state": "VA", "multiplier": 1.03 },
+      { "state": "VT", "multiplier": 1.04 },
+      { "state": "WA", "multiplier": 1.10 },
+      { "state": "WI", "multiplier": 0.98 },
+      { "state": "WV", "multiplier": 0.90 },
+      { "state": "WY", "multiplier": 0.96 }
+    ]
+  },
+
+  "calculation_examples": {
+    "explain": "effective_cost = base_monthly_usd * effective_multiplier (resolve multiplier by precedence: WA exact ZIP → WA ZIP3 → WA state → non-WA exact ZIP → non-WA ZIP3 → non-WA state → default).",
+    "wa_example": {
+      "zip": "98101",
+      "category": "assisted_living",
+      "base_monthly_usd": 5500,
+      "matched_multiplier": 1.15,
+      "effective_monthly_cost": 6325
+    },
+    "non_wa_example": {
+      "zip": "10001",
+      "category": "memory_care",
+      "base_monthly_usd": 7200,
+      "matched_multiplier": 1.40,
+      "effective_monthly_cost": 10080
+    }
+  },
+
+  "notes": [
+    "All WA ZIPs are covered by either exact overrides (major metros) or ZIP3 coverage (980–994). If an exact ZIP and ZIP3 both exist, exact ZIP wins.",
+    "If a WA ZIP is not matched by exact or ZIP3, the WA state fallback (1.10) applies, then default if somehow unmatched.",
+    "Base costs are national median estimates; update annually.",
+    "Use health/safety flags to apply additional add-ons outside this table (e.g., medication, falls, cognition)."
+  ]
+}
