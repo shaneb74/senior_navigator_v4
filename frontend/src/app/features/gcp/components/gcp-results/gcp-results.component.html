@@ -1,0 +1,66 @@
+<div class="results-container" *ngIf="recommendation$ | async as recommendation">
+  <mat-card class="results-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>check_circle</mat-icon>
+        Your Care Recommendation
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="recommendation-section">
+        <h2>{{ getCareTypeLabel(recommendation.recommendation) }}</h2>
+        <p class="confidence">
+          {{ getConfidenceLabel(recommendation.confidence) }}
+          ({{ (recommendation.confidence * 100).toFixed(0) }}%)
+        </p>
+      </div>
+
+      <div class="scores-section">
+        <h3>Assessment Scores</h3>
+        <div class="score-grid">
+          <div class="score-item">
+            <span class="label">Safety Risk:</span>
+            <span class="value">{{ (recommendation.raw_scores.safety_risk * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="score-item">
+            <span class="label">ADL Dependency:</span>
+            <span class="value">{{ (recommendation.raw_scores.adl_dependency * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="score-item">
+            <span class="label">Cognitive Impairment:</span>
+            <span class="value">{{ (recommendation.raw_scores.cognitive_impairment * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="score-item">
+            <span class="label">Social Isolation:</span>
+            <span class="value">{{ (recommendation.raw_scores.social_isolation * 100).toFixed(0) }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flags-section" *ngIf="recommendation.flags.length > 0">
+        <h3>Important Notes</h3>
+        <ul>
+          <li *ngFor="let flag of recommendation.flags">{{ flag }}</li>
+        </ul>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/cost-planner">
+        Continue to Cost Planner
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <button mat-button routerLink="/hub">
+        Back to Hub
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+<div class="no-results" *ngIf="!(recommendation$ | async)">
+  <p>No recommendation available. Please complete the assessment first.</p>
+  <button mat-raised-button color="primary" routerLink="/gcp">
+    Start Assessment
+  </button>
+</div>

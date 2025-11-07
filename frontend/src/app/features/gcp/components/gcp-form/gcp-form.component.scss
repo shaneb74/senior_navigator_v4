@@ -1,0 +1,90 @@
+.gcp-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.gcp-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  h1 {
+    margin: 0 0 8px 0;
+    font-size: 32px;
+    font-weight: 500;
+  }
+
+  .subtitle {
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0 0 24px 0;
+  }
+
+  mat-progress-bar {
+    margin-top: 16px;
+  }
+}
+
+.section-card {
+  margin-bottom: 24px;
+
+  mat-card-header {
+    margin-bottom: 24px;
+  }
+
+  mat-card-title {
+    font-size: 24px;
+  }
+
+  mat-card-subtitle {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  mat-card-content {
+    min-height: 200px;
+  }
+
+  mat-card-actions {
+    padding: 16px;
+    gap: 8px;
+  }
+}
+
+.info-section {
+  p {
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .actions {
+    margin-top: 32px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+}
+
+form {
+  formly-form {
+    .formly-field {
+      margin-bottom: 24px;
+    }
+  }
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+
+  mat-progress-bar {
+    width: 300px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
