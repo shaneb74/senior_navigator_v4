@@ -1,9 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { FormGroup } from '@angular/forms';
-import { FormlyFieldConfig, FormlyFormOptions } from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
+import { FormlyMaterialModule } from '@ngx-formly/material';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
+// Material
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatIconModule } from '@angular/material/icon';
 
 import * as GCPActions from '../../store/gcp.actions';
 import * as GCPSelectors from '../../store/gcp.selectors';
@@ -14,7 +23,17 @@ import { ModuleConfigService } from '../../../../core/services/module-config.ser
   selector: 'app-gcp-form',
   templateUrl: './gcp-form.component.html',
   styleUrls: ['./gcp-form.component.scss'],
-  standalone: false
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormlyModule,
+    FormlyMaterialModule,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressBarModule,
+    MatIconModule
+  ]
 })
 export class GcpFormComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -52,6 +71,8 @@ export class GcpFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log('[GCP] Component initialized, dispatching loadModuleConfig');
+    
     // Load module configuration
     this.store.dispatch(GCPActions.loadModuleConfig());
 
@@ -59,6 +80,7 @@ export class GcpFormComponent implements OnInit, OnDestroy {
     this.config$
       .pipe(takeUntil(this.destroy$))
       .subscribe(config => {
+        console.log('[GCP] Config received:', config);
         if (config) {
           this.fields = this.moduleConfigService.convertToFormlyFields(config);
         }
@@ -111,16 +133,24 @@ export class GcpFormComponent implements OnInit, OnDestroy {
   }
 
   private updateCurrentSectionFields(section: Section): void {
+    console.log('[GCP] Updating section fields for:', section.id, section);
+    
     // Skip info sections
     if (section.type === 'info' || !section.questions) {
+      console.log('[GCP] Skipping info section or section without questions');
       this.currentSectionFields = [];
       return;
     }
 
+    console.log('[GCP] Converting', section.questions.length, 'questions to Formly fields');
+    
     // Convert section questions to Formly fields
     this.currentSectionFields = section.questions.map(q => {
-      const field = this.moduleConfigService['convertQuestionToFormlyField'](q);
+      const field = this.moduleConfigService.convertQuestionToFormlyField(q);
+      console.log('[GCP] Question:', q.id, '→ Field:', field);
       return field!;
-    });
+    }).filter(f => f !== null);
+    
+    console.log('[GCP] Current section fields:', this.currentSectionFields);
   }
 }

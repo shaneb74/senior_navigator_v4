@@ -36,7 +36,7 @@ export interface Section {
 export interface Question {
   id: string;
   type: string;
-  select?: 'single' | 'multiple';
+  select?: 'single' | 'multiple' | 'multi';
   label: string;
   required?: boolean;
   default?: any;
@@ -105,7 +105,7 @@ export class ModuleConfigService {
         fields.push({
           key: section.id,
           wrappers: ['section'],
-          templateOptions: {
+          props: {
             label: section.title,
             description: section.description,
           },
@@ -120,11 +120,11 @@ export class ModuleConfigService {
   /**
    * Convert a single question to a Formly field
    */
-  private convertQuestionToFormlyField(question: Question): FormlyFieldConfig | null {
+  convertQuestionToFormlyField(question: Question): FormlyFieldConfig | null {
     const field: FormlyFieldConfig = {
       key: question.id,
       type: this.getFormlyType(question),
-      templateOptions: {
+      props: {
         label: question.label,
         required: question.required || false,
         options: question.options?.map(opt => ({
@@ -132,21 +132,23 @@ export class ModuleConfigService {
           value: opt.value,
         })) || [],
         description: question.navi_guidance?.tip,
+        multiple: question.select === 'multi' || question.select === 'multiple',
       },
       defaultValue: question.default,
     };
 
     // Add validation
     if (question.required) {
-      field.validators = {
-        validation: ['required'],
+      field.props = {
+        ...field.props,
+        required: true
       };
     }
 
     // Add custom attributes from UI config
     if (question.ui) {
-      field.templateOptions = {
-        ...field.templateOptions,
+      field.props = {
+        ...field.props,
         ...question.ui,
       };
     }
@@ -178,8 +180,8 @@ export class ModuleConfigService {
         if (question.select === 'single' && question.options) {
           return 'radio';
         }
-        if (question.select === 'multiple' && question.options) {
-          return 'checkbox';
+        if ((question.select === 'multiple' || question.select === 'multi') && question.options) {
+          return 'select';  // Use select for multi-select dropdown
         }
         return 'input';
 

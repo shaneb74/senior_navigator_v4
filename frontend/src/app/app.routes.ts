@@ -8,7 +8,7 @@ export const routes: Routes = [
   },
   {
     path: 'gcp',
-    loadChildren: () => import('./features/gcp/gcp.module').then(m => m.GcpModule)
+    loadChildren: () => import('./features/gcp/gcp.routes').then(m => m.GCP_ROUTES)
   },
   {
     path: '**',
