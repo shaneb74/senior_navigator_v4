@@ -1,0 +1,21 @@
+.triage-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.triage-card {
+  width: 100%;
+  max-width: 720px;
+}
+
+section {
+  margin-bottom: 1.5rem;
+}
+
+.helper {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.6);
+}

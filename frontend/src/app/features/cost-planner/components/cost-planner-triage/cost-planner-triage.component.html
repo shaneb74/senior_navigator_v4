@@ -1,0 +1,53 @@
+<div class="triage-container">
+  <mat-card class="triage-card">
+    <mat-card-header>
+      <mat-card-title>Quick questions</mat-card-title>
+      <mat-card-subtitle>Answer a few qualifiers so we can tailor the assessment.</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="triageForm">
+        <section>
+          <h3>Medicaid or State Assistance</h3>
+          <mat-checkbox formControlName="isOnMedicaid">
+            Yes, currently on Medicaid or State Assistance
+          </mat-checkbox>
+          <p class="helper">
+            We use this to highlight coverage options and financial planning steps.
+          </p>
+        </section>
+
+        <section>
+          <h3>Veteran Status</h3>
+          <mat-checkbox formControlName="isVeteran">
+            Yes, a Veteran or surviving spouse
+          </mat-checkbox>
+          <p class="helper">
+            Enables VA benefit modules and Aid &amp; Attendance guidance.
+          </p>
+        </section>
+
+        <section>
+          <h3>Home Ownership</h3>
+          <mat-checkbox formControlName="isHomeowner">
+            Yes, the care recipient owns a home
+          </mat-checkbox>
+          <p class="helper">
+            Helps us understand available equity and asset strategies.
+          </p>
+        </section>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button type="button" (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="onContinue()">
+        Continue to Assessment
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

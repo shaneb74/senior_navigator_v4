@@ -1,20 +1,38 @@
 # Senior Navigator v4
 
-**Status**: 🚧 In Development  
-**Architecture**: Angular 17+ with ngx-formly  
-**Purpose**: Production rebuild of Senior Navigator v3 prototype
+**Status**: ✅ **Ready for Developer Handoff**  
+**Architecture**: Angular 20 + Node.js/Express + OpenAI  
+**Test Coverage**: 71 passing tests, 100% coverage on NgRx store  
+**Purpose**: Production-ready GCP care recommendation engine with deterministic + LLM scoring
+
+---
+
+## 🎯 For New Developers
+
+**Start here to understand the GCP recommendation system:**
+
+1. **[GETTING_STARTED.md](./GETTING_STARTED.md)** ⭐ Read this first - 5-minute overview
+2. **[docs/DETERMINISTIC_VS_LLM.md](./docs/DETERMINISTIC_VS_LLM.md)** - How scoring & LLM adjudication works
+3. **[docs/API_EXAMPLES.md](./docs/API_EXAMPLES.md)** - Test the API with real examples
+4. **[docs/GCP_ARCHITECTURE.md](./docs/GCP_ARCHITECTURE.md)** - Complete system architecture
+
+**Critical code files:**
+- `backend/services/gcpScoring.js` - Deterministic scoring engine
+- `backend/services/gcpNaviEngine.js` - LLM adjudication logic
+- `frontend/src/app/features/gcp/store/` - NgRx state management
+- `frontend/src/assets/configs/gcp_module.json` - Question configuration
 
 ---
 
 ## Overview
 
-Senior Navigator v4 is a complete rewrite of the v3 Streamlit prototype using modern web technologies:
+Senior Navigator v4 is a production-ready implementation of the GCP (Guided Care Plan) recommendation system:
 
-- **Frontend**: Angular 17+ with ngx-formly for JSON-driven forms
-- **Backend**: NestJS or FastAPI (TBD)
-- **State Management**: NgRx (mirrors Streamlit session_state)
-- **Forms**: ngx-formly (mirrors module.json rendering)
-- **Contracts**: MCIP-style typed contracts
+- **Frontend**: Angular 20 with ngx-formly for JSON-driven forms
+- **Backend**: Node.js/Express with OpenAI GPT-4o-mini integration
+- **State Management**: NgRx (actions, reducers, effects, selectors)
+- **Forms**: ngx-formly (renders forms from JSON configuration)
+- **Scoring**: Dual-engine (deterministic + optional LLM adjudication)
 
 ---
 
@@ -38,23 +56,38 @@ Scoring, gates, LLM mediation, and guardrails stay server-side. Frontend is a pr
 
 ### Prerequisites
 
-- Node.js 18+ 
-- npm 9+
-- Angular CLI 17+
+- Node.js 20+
+- npm 10+
+- OpenAI API key (for LLM features)
 
-### Setup
+### Run the Application
 
 ```bash
-# Run the setup script
-./setup.sh
+# 1. Install dependencies
+cd frontend && npm install
+cd ../backend && npm install
 
-# Or manually:
-cd frontend
-ng serve
+# 2. Configure backend (create .env file)
+cd backend
+echo "OPENAI_API_KEY=your-key-here" > .env
+echo "PORT=3000" >> .env
+echo "LLM_MODE=assist" >> .env
 
-# Open browser
+# 3. Start backend (Terminal 1)
+node server.js
+
+# 4. Start frontend (Terminal 2)
+cd frontend && npm start
+
+# 5. Open browser
 open http://localhost:4200
 ```
+
+**Access points:**
+- Frontend: http://localhost:4200
+- Hub/Lobby: http://localhost:4200/hub
+- GCP Assessment: http://localhost:4200/gcp
+- Backend API: http://localhost:3000/api
 
 ---
 
@@ -62,135 +95,240 @@ open http://localhost:4200
 
 ```
 senior_navigator_v4/
-├── frontend/           # Angular application
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── core/           # Services, guards
-│   │   │   ├── shared/         # Components, models
-│   │   │   └── features/       # GCP, Cost Planner, PFMA, Hub
-│   │   └── assets/
-│   │       └── configs/        # JSON manifests
-│   └── package.json
+├── docs/                   # 📚 Developer documentation
+│   ├── DETERMINISTIC_VS_LLM.md      # How scoring works ⭐
+│   ├── GCP_ARCHITECTURE.md          # System architecture
+│   ├── CONFIGURATION_GUIDE.md       # JSON config reference
+│   ├── TESTING_GUIDE.md             # Testing patterns
+│   ├── DEPLOYMENT.md                # Production deployment
+│   └── API_EXAMPLES.md              # API testing examples
 │
-├── backend/            # Backend API (coming soon)
-├── docs/               # Architecture documentation
-└── shared/             # Shared TypeScript types
+├── frontend/               # Angular 20 application
+│   ├── src/app/
+│   │   ├── core/           # Services, guards, interceptors
+│   │   ├── shared/         # Shared components, models, pipes
+│   │   └── features/       # Feature modules
+│   │       ├── gcp/        # 🎯 Guided Care Plan (primary feature)
+│   │       ├── cost-planner/
+│   │       ├── pfma/
+│   │       └── hub/
+│   └── src/assets/
+│       └── configs/        # JSON manifests (gcp_module.json)
+│
+├── backend/                # Node.js/Express API
+│   ├── server.js           # Express server
+│   ├── routes/             # API endpoints
+│   │   └── gcp.js          # POST /api/gcp/assess
+│   └── services/           # Business logic
+│       ├── gcpScoring.js   # 🎯 Deterministic scoring engine
+│       ├── gcpNaviEngine.js # 🎯 LLM adjudication
+│       └── llmClient.js    # OpenAI integration
+│
+└── GETTING_STARTED.md      # ⭐ Start here for onboarding
 ```
 
 ---
 
-## Architecture
+## Key Features
 
-### Frontend (Angular)
+### 1. JSON-Driven Configuration
+All questions, options, scores, and business rules live in `/frontend/src/assets/configs/gcp_module.json` (1066 lines). No hardcoded questions in components.
 
-- **ngx-formly**: Renders forms from JSON manifests (mirrors v3's `navi_module.py`)
-- **NgRx**: State management (mirrors v3's `session_state`)
-- **MCIP Service**: Contract coordinator (mirrors v3's `mcip.py`)
+### 2. Dual-Engine Scoring System
+- **Deterministic Engine**: Always runs, calculates scores from form data
+- **LLM Engine** (optional): GPT-4o-mini provides AI-enhanced recommendations
+- **Adjudication**: Sophisticated guardrail system decides final recommendation
 
-### Backend (NestJS/FastAPI)
+### 3. Three LLM Policy Modes
+- `off` - Deterministic only (no AI calls)
+- `shadow` - LLM runs but doesn't override (logging/comparison only)
+- `assist` - LLM can override deterministic if confidence > 70%
 
-- **Scoring Engine**: Deterministic scoring from JSON (mirrors v3's `logic.py`)
-- **LLM Mediation**: Optional AI enhancement (mirrors v3's `gcp_navi_engine.py`)
-- **Contract Publishing**: Typed contracts (mirrors v3's MCIP)
-
-### JSON Manifests
-
-- **`gcp_module.json`**: Questions, options, scores, flags
-- **`cost_planner_modules.json`**: Cost assessment modules
-- **`regional_cost_config.json`**: Regional pricing data
+### 4. Guardrail System (5 layers)
+1. Cognitive gate - Enforces memory care for severe cognitive issues
+2. Behavior gate - Blocks low tiers for high-risk behaviors
+3. Tier filtering - LLM can only suggest allowed tiers
+4. Confidence threshold - Rejects low-confidence LLM suggestions
+5. Fallback strategy - Always returns deterministic if LLM fails
 
 ---
 
-## Implementation Status
+## Architecture Highlights
 
-### ✅ Completed
-- Project structure defined
-- Setup script created
-- Core service interfaces designed
+### Frontend (Angular 20)
+- **Standalone components** with inject() pattern
+- **NgRx state management** - 71 tests, 100% coverage
+- **ngx-formly** - Renders forms from JSON configuration
+- **Material Design UI** - Responsive, accessible components
+- **TypeScript strict mode** - Full type safety
 
-### 🚧 In Progress
-- Angular application setup
-- ngx-formly integration
-- NgRx store setup
+### Backend (Node.js/Express)
+- **Deterministic scoring** - Pure JavaScript, no dependencies
+- **OpenAI integration** - GPT-4o-mini via official SDK
+- **Tier map routing** - Cognition × Support matrix
+- **Guardrails** - Server-side validation & safety checks
+- **Contract-based API** - Returns `CareRecommendation` contract
 
-### ⏳ Planned
-- GCP feature module
-- Cost Planner module
-- Backend API
-- LLM integration
-- Testing suite
+### Test Coverage
+- ✅ 71 passing tests (reducers, selectors)
+- ✅ 100% coverage on NgRx store layer
+- ✅ Edge cases and error handling tested
+- ⏳ Component tests (planned)
+- ⏳ E2E tests (planned)
 
 ---
 
 ## Documentation
 
-- **`SETUP_GUIDE.md`**: Complete setup and implementation guide
-- **`docs/ARCHITECTURE.md`**: System architecture (coming soon)
-- **`docs/MIGRATION_FROM_V3.md`**: Migration notes (coming soon)
+### For Developers
+- **[GETTING_STARTED.md](./GETTING_STARTED.md)** - Quick onboarding guide
+- **[docs/GCP_ARCHITECTURE.md](./docs/GCP_ARCHITECTURE.md)** - Complete system architecture
+- **[docs/DETERMINISTIC_VS_LLM.md](./docs/DETERMINISTIC_VS_LLM.md)** - Scoring algorithms explained
+- **[docs/API_EXAMPLES.md](./docs/API_EXAMPLES.md)** - Test the API with curl
+
+### For Configuration
+- **[docs/CONFIGURATION_GUIDE.md](./docs/CONFIGURATION_GUIDE.md)** - Edit gcp_module.json
+
+### For Testing
+- **[docs/TESTING_GUIDE.md](./docs/TESTING_GUIDE.md)** - Test patterns and examples
+
+### For Deployment
+- **[docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Production deployment guide
 
 ---
 
-## Reference: v3 Prototype
+## Implementation Status
 
-All architecture decisions are based on the v3 Streamlit prototype:
+### ✅ Completed (Production Ready)
+- ✅ Full GCP assessment flow (intro → questions → results)
+- ✅ JSON-driven forms with ngx-formly
+- ✅ NgRx state management with effects
+- ✅ Backend scoring API with deterministic engine
+- ✅ LLM integration (OpenAI GPT-4o-mini)
+- ✅ Guardrail system and adjudication logic
+- ✅ Unit tests (71 tests, 100% store coverage)
+- ✅ Comprehensive documentation (6 guides)
+- ✅ Hub/lobby navigation
+- ✅ MCIP product coordination
+- ✅ Error handling and validation
 
-- **Repository**: `cca_senior_navigator_v3`
-- **Branch**: `feature/refactor-gcp-cost-planner`
-- **Documentation**: See `docs/` directory in v3
-
-Key v3 reference documents:
-- `ARCHITECT_QUESTIONS_ANSWERED.md` - How scoring/LLM/JSON works
-- `JSON_CONFIG_AND_LLM_GUIDE.md` - Complete pipeline explanation
-- `ARCHITECTURE_FOR_REPLATFORM.md` - System architecture
-- `CODE_REFERENCE_MAP.md` - v3 code locations
+### 🚧 Planned Enhancements
+- ⏳ Component integration tests
+- ⏳ E2E test suite
+- ⏳ Sentry error tracking
+- ⏳ Cost Planner module
+- ⏳ PFMA module
+- ⏳ Production deployment (AWS/GCP)
 
 ---
 
-## Development
+## Development Commands
 
-### Run Development Server
-
+### Run Application
 ```bash
-cd frontend
-ng serve
+# Backend (Terminal 1)
+cd backend && node server.js
+
+# Frontend (Terminal 2)
+cd frontend && npm start
 ```
 
 ### Run Tests
-
 ```bash
-cd frontend
-ng test
+# All tests
+cd frontend && npm test
+
+# Tests with coverage
+npm test -- --code-coverage
+
+# Specific tests
+npm test -- --include='**/gcp.reducer.spec.ts'
 ```
 
 ### Build for Production
-
 ```bash
-cd frontend
-ng build --configuration production
+cd frontend && npm run build
+# Output: dist/senior-navigator-v4/browser/
 ```
 
 ---
 
-## Contributing
+## API Endpoints
 
-See `SETUP_GUIDE.md` for:
-- Architecture principles
-- Code organization
-- Service patterns
-- State management approach
+### POST /api/gcp/assess
+Submit GCP assessment and receive care recommendation.
+
+**Request:**
+```json
+{
+  "formData": { "question_id": "answer_value" },
+  "config": { "module": {...}, "sections": [...] },
+  "options": { "llm_mode": "assist" }
+}
+```
+
+**Response:**
+```json
+{
+  "tier": "assisted_living",
+  "tier_score": 18,
+  "confidence": 0.95,
+  "flags": [...],
+  "rationale": [...],
+  "deterministic_result": {...},
+  "llm_result": {...},
+  "adjudication": {...}
+}
+```
+
+See [docs/API_EXAMPLES.md](./docs/API_EXAMPLES.md) for complete examples.
+
+---
+
+## Environment Variables
+
+### Backend (.env)
+```bash
+# Required
+OPENAI_API_KEY=sk-...              # OpenAI API key
+
+# Optional
+PORT=3000                          # Server port (default: 3000)
+LLM_MODE=assist                    # off | shadow | assist (default: shadow)
+CONFIDENCE_THRESHOLD=0.7           # LLM confidence threshold (default: 0.7)
+OPENAI_MODEL=gpt-4o-mini          # OpenAI model (default: gpt-4o-mini)
+```
+
+### Frontend (environment.ts)
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api',
+  llm: { enabled: true, defaultMode: 'shadow' }
+};
+```
 
 ---
 
 ## Questions?
 
-This is a direct port of the v3 prototype architecture. For architectural questions, refer to:
+### Understanding the System
+1. Read [GETTING_STARTED.md](./GETTING_STARTED.md) for 5-minute overview
+2. Read [docs/DETERMINISTIC_VS_LLM.md](./docs/DETERMINISTIC_VS_LLM.md) for scoring logic
+3. Review backend code: `backend/services/gcpScoring.js` and `gcpNaviEngine.js`
+4. Test the API with [docs/API_EXAMPLES.md](./docs/API_EXAMPLES.md)
 
-1. v3 documentation in `cca_senior_navigator_v3/docs/`
-2. `SETUP_GUIDE.md` in this repo
-3. Code comments in core services
+### Configuration Questions
+- See [docs/CONFIGURATION_GUIDE.md](./docs/CONFIGURATION_GUIDE.md) for editing `gcp_module.json`
+
+### Testing Questions
+- See [docs/TESTING_GUIDE.md](./docs/TESTING_GUIDE.md) for test patterns
+
+### Deployment Questions
+- See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for production deployment
 
 ---
 
-**Version**: 0.1.0  
-**Created**: November 7, 2025  
+**Version**: 1.0.0  
+**Created**: November 2025  
 **License**: Proprietary

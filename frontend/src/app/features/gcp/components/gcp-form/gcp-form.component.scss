@@ -1,59 +1,110 @@
 .gcp-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 24px;
+  min-height: 100vh;
 }
 
 .gcp-header {
   text-align: center;
   margin-bottom: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 32px 24px;
+  border-radius: 8px;
+  margin: -24px -24px 32px -24px;
 
   h1 {
     margin: 0 0 8px 0;
-    font-size: 32px;
-    font-weight: 500;
+    font-size: 36px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
   .subtitle {
-    color: rgba(0, 0, 0, 0.6);
+    color: rgba(255, 255, 255, 0.95);
     margin: 0 0 24px 0;
+    font-size: 16px;
   }
 
   mat-progress-bar {
     margin-top: 16px;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    
+    ::ng-deep .mdc-linear-progress__bar-inner {
+      border-top-width: 8px;
+    }
   }
 }
 
 .section-card {
   margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: visible;
 
   mat-card-header {
     margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f5f5f5;
   }
 
   mat-card-title {
-    font-size: 24px;
+    font-size: 26px;
+    font-weight: 600;
+    color: #333;
   }
 
   mat-card-subtitle {
-    font-size: 14px;
+    font-size: 15px;
     margin-top: 8px;
+    line-height: 1.5;
+    color: rgba(0, 0, 0, 0.7);
   }
 
   mat-card-content {
-    min-height: 200px;
+    min-height: 300px;
+    padding: 24px 0;
+    overflow: visible;
   }
 
   mat-card-actions {
-    padding: 16px;
-    gap: 8px;
+    padding: 16px 24px;
+    gap: 12px;
+    background: #fafafa;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.form-wrapper {
+  padding: 0 8px;
+  
+  form {
+    padding-bottom: 40px; // Extra space at bottom for dropdowns
   }
 }
 
 .info-section {
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f3ff 100%);
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+
   p {
-    line-height: 1.6;
+    line-height: 1.8;
     margin-bottom: 16px;
+    font-size: 16px;
+    color: #333;
+    
+    &:first-child {
+      font-size: 18px;
+      font-weight: 500;
+    }
   }
 
   .actions {
@@ -61,14 +112,187 @@
     display: flex;
     gap: 16px;
     justify-content: center;
+    
+    button {
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}
+
+.name-capture {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
   }
 }
 
 form {
   formly-form {
-    .formly-field {
-      margin-bottom: 24px;
+    display: block;
+    
+    // Ensure proper spacing between form fields
+    ::ng-deep .formly-field {
+      margin-bottom: 40px; // Increased from 32px
+      position: relative;
+      clear: both;
+      
+      // Add more space for fields with dropdowns
+      &.formly-field-mat-select,
+      &.formly-field-select {
+        margin-bottom: 60px; // Extra space for dropdown expansion
+        padding-bottom: 8px;
+      }
+      
+      // Last field needs less space
+      &:last-child {
+        margin-bottom: 16px;
+      }
     }
+
+    // Formly wrapper styling
+    ::ng-deep formly-wrapper-mat-form-field {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    // Style radio button groups
+    ::ng-deep mat-radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      
+      mat-radio-button {
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          border-color: #667eea;
+          background: #f8f9ff;
+        }
+        
+        &.mat-mdc-radio-checked {
+          border-color: #667eea;
+          background: #f0f3ff;
+        }
+      }
+    }
+
+    // Style checkboxes
+    ::ng-deep mat-checkbox {
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: block;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+      }
+      
+      &.mat-mdc-checkbox-checked {
+        border-color: #667eea;
+        background: #f0f3ff;
+      }
+    }
+
+    // Style select/dropdown fields
+    ::ng-deep mat-select {
+      .mat-mdc-select-trigger {
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          border-color: #667eea;
+        }
+      }
+      
+      &.mat-focused .mat-mdc-select-trigger {
+        border-color: #667eea;
+      }
+    }
+
+    // Style input fields
+    ::ng-deep mat-form-field {
+      width: 100%;
+      
+      .mat-mdc-text-field-wrapper {
+        padding: 0;
+        
+        .mat-mdc-form-field-flex {
+          padding: 12px 16px;
+          border: 2px solid #e0e0e0;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+          
+          &:hover {
+            border-color: #667eea;
+          }
+        }
+      }
+      
+      &.mat-focused .mat-mdc-form-field-flex {
+        border-color: #667eea;
+      }
+    }
+
+    // Field labels
+    ::ng-deep .mat-mdc-form-field-label,
+    ::ng-deep formly-field label {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    // Error messages
+    ::ng-deep .mat-mdc-form-field-error,
+    ::ng-deep formly-validation-message {
+      color: #f44336;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    // Required indicator
+    ::ng-deep .mat-mdc-form-field-required-marker {
+      color: #f44336;
+    }
+  }
+}
+
+.form-section {
+  margin-bottom: 32px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.form-section-header {
+  margin-bottom: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 22px;
+    color: #1f2937;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: #6b7280;
   }
 }
 
@@ -78,13 +302,82 @@ form {
   align-items: center;
   justify-content: center;
   min-height: 400px;
+  padding: 48px 24px;
 
   mat-progress-bar {
     width: 300px;
     margin-bottom: 16px;
+    height: 6px;
+    border-radius: 3px;
   }
 
   p {
     color: rgba(0, 0, 0, 0.6);
+    font-size: 16px;
+    margin-top: 16px;
   }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .gcp-container {
+    padding: 16px;
+  }
+
+  .gcp-header {
+    margin: -16px -16px 24px -16px;
+    padding: 24px 16px;
+
+    h1 {
+      font-size: 28px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+    }
+  }
+
+  .section-card {
+    mat-card-title {
+      font-size: 22px;
+    }
+
+    mat-card-actions {
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  form formly-form {
+    ::ng-deep mat-radio-group {
+      mat-radio-button {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// Fix dropdown overlay z-index issues
+::ng-deep .cdk-overlay-container {
+  z-index: 9999 !important;
+}
+
+::ng-deep .mat-mdc-select-panel {
+  max-height: 400px !important;
+  margin-top: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 8px !important;
+}
+
+// Ensure proper stacking context
+::ng-deep .mat-mdc-form-field {
+  position: relative;
+  z-index: auto;
+}
+
+::ng-deep .mat-mdc-select {
+  position: relative;
 }

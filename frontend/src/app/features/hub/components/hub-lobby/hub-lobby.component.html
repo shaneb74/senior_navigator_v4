@@ -1,0 +1,66 @@
+<div class="hub-container">
+  <!-- Header -->
+  <div class="hub-header">
+    <h1>Senior Navigator</h1>
+    <p class="subtitle">Your complete guide to finding and financing senior care</p>
+    
+    <!-- Overall Progress -->
+    <div class="progress-section">
+      <div class="progress-label">
+        <span>Overall Progress</span>
+        <span class="progress-value">{{ overallProgress }}%</span>
+      </div>
+      <mat-progress-bar 
+        mode="determinate" 
+        [value]="overallProgress"
+        color="primary">
+      </mat-progress-bar>
+    </div>
+  </div>
+
+  <!-- Product Cards -->
+  <div class="products-grid">
+    <mat-card 
+      *ngFor="let product of products"
+      class="product-card"
+      [class.completed]="product.completed"
+      [class.locked]="product.locked"
+      (click)="navigateToProduct(product)">
+      
+      <mat-card-header>
+        <div class="product-icon" [class.completed]="product.completed">
+          <mat-icon>{{ product.icon }}</mat-icon>
+        </div>
+        <mat-card-title>{{ product.title }}</mat-card-title>
+        <mat-chip 
+          [color]="product.completed ? 'accent' : 'primary'"
+          [disabled]="product.locked">
+          <mat-icon>{{ getStatusIcon(product) }}</mat-icon>
+          {{ getStatusLabel(product) }}
+        </mat-chip>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>{{ product.description }}</p>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button 
+          mat-raised-button 
+          [color]="product.completed ? 'accent' : 'primary'"
+          [disabled]="product.locked">
+          {{ product.completed ? 'View Results' : 'Start' }}
+          <mat-icon>{{ product.locked ? 'lock' : 'arrow_forward' }}</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Footer Actions -->
+  <div class="hub-footer">
+    <button mat-stroked-button (click)="resetProgress()" color="warn">
+      <mat-icon>restart_alt</mat-icon>
+      Reset All Progress
+    </button>
+  </div>
+</div>

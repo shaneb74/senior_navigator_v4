@@ -1,0 +1,26 @@
+{
+  "none": {
+    "low": "none",
+    "moderate": "in_home",
+    "high": "assisted_living",
+    "24h": "assisted_living"
+  },
+  "mild": {
+    "low": "in_home",
+    "moderate": "in_home",
+    "high": "assisted_living",
+    "24h": "assisted_living"
+  },
+  "moderate": {
+    "low": "in_home",
+    "moderate": "assisted_living",
+    "high": "memory_care",
+    "24h": "memory_care"
+  },
+  "high": {
+    "low": "assisted_living",
+    "moderate": "memory_care",
+    "high": "memory_care",
+    "24h": "memory_care_high_acuity"
+  }
+}

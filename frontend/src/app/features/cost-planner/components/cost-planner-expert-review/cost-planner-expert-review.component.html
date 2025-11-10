@@ -1,0 +1,154 @@
+<div class="results-container" *ngIf="profile$ | async as profile; else noProfile">
+  <mat-card class="results-card">
+    <mat-card-header>
+      <mat-card-title>
+        Cost Plan Summary
+        <span *ngIf="profile.care_recipient_name">for {{ profile.care_recipient_name }}</span>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <section class="coverage-summary" *ngIf="profile.coverage_summary as coverage">
+        <div class="coverage-banner">
+          <div>
+            <span class="label">Monthly Gap</span>
+            <strong [class.positive]="coverage.monthly_gap <= 0" [class.negative]="coverage.monthly_gap > 0">
+              {{ formatCurrency(coverage.monthly_gap) }}
+            </strong>
+          </div>
+          <div>
+            <span class="label">Coverage Duration</span>
+            <strong>{{ coverage.coverage_label }}</strong>
+          </div>
+        </div>
+        <div class="coverage-timeline" *ngIf="coverage.timeline?.length">
+          <div
+            class="timeline-segment"
+            *ngFor="let segment of coverage.timeline"
+            [style.flex]="segment.months >= 999 ? 5 : segment.months || 1"
+            [style.background]="segment.color || '#6366f1'"
+          >
+            <span>{{ segment.label }}</span>
+            <strong>{{ formatMonths(segment.months) }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <div class="summary-card">
+          <span class="label">Monthly Income</span>
+          <strong>{{ formatCurrency(profile.monthly_income) }}</strong>
+        </div>
+        <div class="summary-card">
+          <span class="label">Estimated Care Cost</span>
+          <strong>{{ formatCurrency(profile.estimated_monthly_care_cost) }}</strong>
+        </div>
+        <div class="summary-card">
+          <span class="label">Monthly Shortfall</span>
+          <strong>{{ formatCurrency(profile.monthly_shortfall) }}</strong>
+        </div>
+        <div class="summary-card">
+          <span class="label">Months of Coverage</span>
+          <strong>{{ profile.months_of_coverage || '—' }}</strong>
+        </div>
+        <div class="summary-card" *ngIf="profile.has_va_benefit">
+          <span class="label">VA Benefit</span>
+          <strong>{{ formatCurrency(profile.va_benefit_amount) }}/mo</strong>
+        </div>
+        <div class="summary-card" *ngIf="profile.net_assets !== undefined">
+          <span class="label">Net Assets</span>
+          <strong>{{ formatCurrency(profile.net_assets) }}</strong>
+        </div>
+        <div class="summary-card" *ngIf="profile.total_debt">
+          <span class="label">Total Debt</span>
+          <strong>{{ formatCurrency(profile.total_debt) }}</strong>
+        </div>
+      </section>
+
+      <section class="quick-estimate" *ngIf="quickEstimate$ | async as quick">
+        <h3>Quick Estimate Reminder</h3>
+        <div class="quick-estimate-grid">
+          <div>
+            <span class="label">Budget</span>
+            <strong>{{ formatCurrency(quick.monthly_budget) }}</strong>
+          </div>
+          <div>
+            <span class="label">Care Level</span>
+            <strong>{{ quick.care_level | titlecase }}</strong>
+          </div>
+          <div>
+            <span class="label">Estimated Cost</span>
+            <strong>{{ formatCurrency(quick.estimated_cost) }}</strong>
+          </div>
+          <div>
+            <span class="label">Gap</span>
+            <strong [class.positive]="quick.gap <= 0" [class.negative]="quick.gap > 0">
+              {{ formatCurrency(quick.gap) }}
+            </strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="runway-section" *ngIf="profile.runway_projection?.length">
+        <h3>Runway Projection</h3>
+        <div class="chart">
+          <div
+            class="bar"
+            *ngFor="let point of profile.runway_projection"
+            [style.height]="(point.balance / (profile.total_liquid_assets || 1)) * 100 + '%'"
+            [attr.title]="'Month ' + point.month + ': ' + formatCurrency(point.balance)"
+          ></div>
+        </div>
+        <p class="chart-caption">Showing balance decline over time with current plan.</p>
+      </section>
+
+      <section class="detail-section insights" *ngIf="getRecommendations(profile).length">
+        <h3>Key Insights</h3>
+        <p>{{ runwayLabel(profile) }}</p>
+        <ul>
+          <li *ngFor="let tip of getRecommendations(profile)">{{ tip }}</li>
+        </ul>
+      </section>
+
+      <section class="detail-columns">
+        <div>
+          <h3>Income Sources</h3>
+          <ul>
+            <li *ngFor="let source of profile.income_sources">
+              {{ source.type | titlecase }} — {{ formatCurrency(source.amount) }}/{{ source.frequency === 'annual' ? 'yr' : 'mo' }}
+            </li>
+            <li *ngIf="profile.income_sources.length === 0">No monthly income recorded.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Assets</h3>
+          <ul>
+            <li>Liquid Assets: {{ formatCurrency(profile.total_liquid_assets) }}</li>
+            <li>Real Estate: {{ formatCurrency(profile.total_real_estate) }}</li>
+            <li *ngIf="profile.asset_categories?.length">
+              <div class="asset-breakdown">
+                <div *ngFor="let cat of profile.asset_categories">
+                  <span>{{ cat.label }}</span>
+                  <strong>{{ formatCurrency(cat.value) }}</strong>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/cost-planner/assessments">Edit Inputs</button>
+      <button mat-button routerLink="/pfma" [disabled]="!(profile.monthly_shortfall && profile.monthly_shortfall > 0)">
+        Continue to Financial Fit
+      </button>
+      <button mat-button routerLink="/hub">Back to Hub</button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+<ng-template #noProfile>
+  <div class="no-results">
+    <p>No cost plan available. Complete the assessment first.</p>
+    <button mat-raised-button color="primary" routerLink="/cost-planner">Start Cost Planner</button>
+  </div>
+</ng-template>

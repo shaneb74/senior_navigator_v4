@@ -5,41 +5,112 @@
  * They match the v3 Python dataclasses and ensure type safety.
  */
 
+export type CareTier =
+  | 'none'
+  | 'in_home'
+  | 'assisted_living'
+  | 'memory_care'
+  | 'memory_care_high_acuity';
+
+export interface TierRanking {
+  tier: CareTier;
+  score: number;
+}
+
+export interface CareFlagCTA {
+  label: string;
+  route: string;
+  filter?: string;
+}
+
+export interface CareFlag {
+  id: string;
+  label: string;
+  description?: string;
+  tone?: 'info' | 'warning' | 'critical';
+  priority?: number;
+  cta?: CareFlagCTA;
+}
+
+export interface AdjudicationDecision {
+  det?: CareTier;
+  llm?: CareTier | null;
+  source?: string;
+  adjudication_reason?: string;
+  allowed?: CareTier[];
+  bands?: { cog?: string; sup?: string };
+  risky?: boolean;
+  conf?: number;
+}
+
+export interface LLMAdvice {
+  tier: CareTier;
+  reasons?: string[];
+  risks?: string[];
+  navi_messages?: string[];
+  questions_next?: string[];
+  confidence: number;
+}
+
+export interface DeterministicResult {
+  tier: CareTier;
+  confidence: number;
+  score: number;
+}
+
+export interface LLMResult {
+  tier: CareTier;
+  confidence: number;
+  reasons?: string[];
+  navi_messages?: string[];
+}
+
 /**
  * Care Recommendation Contract
  * Output from GCP → Input to Cost Planner
  */
 export interface CareRecommendation {
-  // Core recommendation
-  recommendation: CareLevel;
-  confidence: number; // 0.0 - 1.0
-  
-  // Supporting data
-  raw_scores: {
-    safety_risk: number;
-    adl_dependency: number;
-    cognitive_impairment: number;
-    social_isolation: number;
-  };
-  
-  // Risk flags
-  flags: string[];
-  
-  // User inputs (for context)
-  user_inputs: Record<string, any>;
-  
-  // Metadata
-  assessment_id: string;
-  timestamp: string;
+  tier: CareTier;
+  tier_score: number;
+  tier_rankings: TierRanking[];
+  confidence: number;
+  flags: CareFlag[];
+  rationale: string[];
+  suggested_next_product: string;
+  derived?: Record<string, any>;
+  allowed_tiers: CareTier[];
+  generated_at: string;
   version: string;
+  input_snapshot_id: string;
+  rule_set: string;
+  next_step: {
+    product: string;
+    label?: string;
+    description?: string;
+  };
+  status: 'new' | 'in_progress' | 'complete' | 'needs_update';
+  last_updated: string;
+  needs_refresh: boolean;
+  schema_version: number;
+  assessment_id: string;
+  user_inputs: Record<string, any>;
+  score_breakdown?: Record<string, number>;
+  adjudication?: AdjudicationDecision;
+  llm_advice?: LLMAdvice;
+  deterministic_result?: DeterministicResult;
+  llm_result?: LLMResult;
+  timestamp: string;
+  
+  // Legacy aliases for backward compatibility
+  recommendation?: CareTier;
+  raw_scores?: {
+    total_score: number;
+    cognitive_score: number;
+    adl_score: number;
+    safety_score: number;
+    mobility_score?: number;
+  };
 }
-
-export type CareLevel = 
-  | 'independent_living'
-  | 'assisted_living'
-  | 'memory_care'
-  | 'memory_care_high_acuity'
-  | 'skilled_nursing';
 
 /**
  * Financial Profile Contract
@@ -54,6 +125,9 @@ export interface FinancialProfile {
   total_liquid_assets: number;
   total_real_estate: number;
   asset_details: AssetDetail[];
+  asset_categories?: AssetCategory[];
+  total_debt?: number;
+  net_assets?: number;
   
   // Expenses
   estimated_monthly_care_cost: number;
@@ -64,16 +138,26 @@ export interface FinancialProfile {
   region: string;
   
   // Care context (from GCP)
-  care_level: CareLevel;
+  care_level: CareTier;
   care_recipient_name: string;
   
   // Metadata
   profile_id: string;
   timestamp: string;
+  monthly_gap?: number;
+  monthly_shortfall?: number;
+  months_of_coverage?: number;
+  has_va_benefit?: boolean;
+  va_benefit_amount?: number;
+  runway_projection?: Array<{ month: number; balance: number }>;
+  coverage_summary?: CoverageSummary;
+  insights?: string[];
+  va_disability?: VaDisabilityDetails | null;
+  aid_and_attendance?: AidAttendanceDetails | null;
 }
 
 export interface IncomeSource {
-  type: 'social_security' | 'pension' | 'investment' | 'other';
+  type: 'social_security' | 'pension' | 'employment' | 'investment' | 'va_benefit' | 'other';
   amount: number;
   frequency: 'monthly' | 'annual';
 }
@@ -82,6 +166,45 @@ export interface AssetDetail {
   type: 'savings' | 'investment' | 'real_estate' | 'other';
   value: number;
   liquid: boolean;
+}
+
+export interface VaDisabilityDetails {
+  amount: number;
+  rating: number;
+  dependents: string;
+  source?: string;
+}
+
+export interface AidAttendanceDetails {
+  amount: number;
+  household_status: string;
+  eligible: boolean;
+  max_benefit: number;
+  estimated_amount: number;
+  highlight: boolean;
+}
+
+export interface AssetCategory {
+  key: string;
+  label: string;
+  value: number;
+  accessible_value: number;
+  liquid: boolean;
+  color?: string;
+}
+
+export interface CoverageTimelineSegment {
+  label: string;
+  months: number;
+  color?: string;
+}
+
+export interface CoverageSummary {
+  monthly_gap: number;
+  asset_coverage_months: number;
+  total_coverage_months: number;
+  coverage_label: string;
+  timeline: CoverageTimelineSegment[];
 }
 
 /**

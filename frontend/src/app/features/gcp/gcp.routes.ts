@@ -4,7 +4,6 @@ import { provideEffects } from '@ngrx/effects';
 import { gcpReducer } from './store/gcp.reducer';
 import { gcpEffects } from './store/gcp.effects';
 import { ModuleConfigService } from '../../core/services/module-config.service';
-import { MCIPService } from '../../core/services/mcip.service';
 
 export const GCP_ROUTES: Routes = [
   {
@@ -12,8 +11,7 @@ export const GCP_ROUTES: Routes = [
     providers: [
       provideState('gcp', gcpReducer),
       provideEffects(gcpEffects),
-      ModuleConfigService,
-      MCIPService
+      ModuleConfigService
     ],
     children: [
       {

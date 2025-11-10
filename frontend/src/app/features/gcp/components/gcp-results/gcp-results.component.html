@@ -3,56 +3,154 @@
     <mat-card-header>
       <mat-card-title>
         <mat-icon>check_circle</mat-icon>
-        Your Care Recommendation
+        Guided Care Recommendation
       </mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
-      <div class="recommendation-section">
-        <h2>{{ getCareTypeLabel(recommendation.recommendation) }}</h2>
+      <section class="recommendation-section">
+        <h2>{{ getCareTypeLabel(resolveTier(recommendation)) }}</h2>
         <p class="confidence">
           {{ getConfidenceLabel(recommendation.confidence) }}
-          ({{ (recommendation.confidence * 100).toFixed(0) }}%)
+          ({{ getConfidencePercent(recommendation) }}%)
         </p>
-      </div>
 
-      <div class="scores-section">
-        <h3>Assessment Scores</h3>
-        <div class="score-grid">
-          <div class="score-item">
-            <span class="label">Safety Risk:</span>
-            <span class="value">{{ (recommendation.raw_scores.safety_risk * 100).toFixed(0) }}%</span>
+        <div class="badge-grid">
+          <div class="badge">
+            <span>Tier Score</span>
+            <strong>{{ getTierScore(recommendation) ?? '—' }}</strong>
           </div>
-          <div class="score-item">
-            <span class="label">ADL Dependency:</span>
-            <span class="value">{{ (recommendation.raw_scores.adl_dependency * 100).toFixed(0) }}%</span>
+          <div class="badge">
+            <span>Next Step</span>
+            <strong>{{ recommendation.next_step.label || (recommendation.suggested_next_product | titlecase) || 'Continue Plan' }}</strong>
           </div>
-          <div class="score-item">
-            <span class="label">Cognitive Impairment:</span>
-            <span class="value">{{ (recommendation.raw_scores.cognitive_impairment * 100).toFixed(0) }}%</span>
-          </div>
-          <div class="score-item">
-            <span class="label">Social Isolation:</span>
-            <span class="value">{{ (recommendation.raw_scores.social_isolation * 100).toFixed(0) }}%</span>
+          <div class="badge">
+            <span>Suggested Product</span>
+            <strong>{{ recommendation.suggested_next_product | titlecase }}</strong>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="flags-section" *ngIf="recommendation.flags.length > 0">
-        <h3>Important Notes</h3>
+      <section class="allowed-section" *ngIf="getAllowedTiers(recommendation) as allowedTiers">
+        <ng-container *ngIf="allowedTiers.length">
+          <h3>Allowed Care Paths</h3>
+          <div class="chip-row">
+            <span
+              class="tier-chip"
+              *ngFor="let tier of allowedTiers"
+              [class.active]="tier === resolveTier(recommendation)"
+            >
+              {{ getCareTypeLabel(tier) }}
+            </span>
+          </div>
+        </ng-container>
+      </section>
+
+      <section class="scores-section" *ngIf="getTierRankings(recommendation) as rankings">
+        <ng-container *ngIf="rankings.length">
+          <h3>Tier Comparison</h3>
+          <div class="score-grid">
+            <div class="score-item" *ngFor="let ranking of rankings; trackBy: trackTier">
+              <span class="label">{{ getCareTypeLabel(ranking.tier) }}</span>
+              <span class="value">{{ ranking.score | number:'1.0-1' }}</span>
+            </div>
+          </div>
+        </ng-container>
+      </section>
+
+      <section
+        class="comparison-section"
+        *ngIf="getDeterministicResult(recommendation) as detResult"
+      >
+        <h3>How the engines compared</h3>
+        <div class="comparison-grid">
+          <div class="comparison-card deterministic">
+            <div class="card-header">
+              <mat-icon>account_tree</mat-icon>
+              <h4>Deterministic Engine</h4>
+            </div>
+            <div class="card-content">
+              <div class="tier">{{ getCareTypeLabel(detResult.tier || resolveTier(recommendation)) }}</div>
+              <div class="stat">Confidence: {{ detResult.confidence * 100 | number:'1.0-0' }}%</div>
+              <div class="stat">Score: {{ detResult.score }}</div>
+            </div>
+          </div>
+
+          <div class="comparison-card llm" *ngIf="getLlmResult(recommendation) as llmResult">
+            <div class="card-header">
+              <mat-icon>psychology</mat-icon>
+              <h4>LLM Adjudicator</h4>
+            </div>
+            <div class="card-content">
+              <div class="tier">{{ getCareTypeLabel(llmResult.tier) }}</div>
+              <div class="stat">Confidence: {{ llmResult.confidence * 100 | number:'1.0-0' }}%</div>
+              <div class="reason" *ngIf="llmResult.reasons?.length">
+                <strong>Reasons</strong>
+                <ul>
+                  <li *ngFor="let reason of llmResult.reasons">{{ reason }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <div class="adjudication-box" *ngIf="getAdjudication(recommendation) as adj">
+            <div class="adjudication-header">
+              <mat-icon>gavel</mat-icon>
+              <h4>Final decision</h4>
+            </div>
+            <div class="adjudication-content">
+              <p>
+                Selected Source:
+                <span class="badge" [class.llm]="adj.source === 'llm'">
+                  {{ adj.source === 'llm' ? 'LLM' : 'Deterministic' }}
+                </span>
+              </p>
+              <p *ngIf="adj.adjudication_reason">
+                Reason: {{ adj.adjudication_reason }}
+              </p>
+              <p *ngIf="adj.allowed?.length">
+                Allowed Tiers: {{ adj.allowed?.join(', ') }}
+              </p>
+            </div>
+          </div>
+      </section>
+
+      <section class="rationale-section" *ngIf="recommendation.rationale?.length">
+        <h3>Why Navi recommends this</h3>
         <ul>
-          <li *ngFor="let flag of recommendation.flags">{{ flag }}</li>
+          <li *ngFor="let reason of recommendation.rationale">
+            {{ reason }}
+          </li>
         </ul>
-      </div>
+      </section>
+
+      <section class="flags-section" *ngIf="normalizeFlags(recommendation.flags) as flags">
+        <ng-container *ngIf="flags.length">
+          <h3>Important Signals</h3>
+          <div class="flag-grid">
+            <div
+              *ngFor="let flag of flags"
+              [ngClass]="getFlagToneClass(flag)"
+            >
+              <div class="flag-title">{{ flag.label }}</div>
+              <p>{{ flag.description }}</p>
+              <a *ngIf="flag.cta" class="flag-cta" routerLink="/hub">
+                {{ flag.cta.label }}
+              </a>
+            </div>
+          </div>
+        </ng-container>
+      </section>
     </mat-card-content>
 
     <mat-card-actions>
-      <button mat-raised-button color="primary" routerLink="/cost-planner">
-        Continue to Cost Planner
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-      <button mat-button routerLink="/hub">
+      <button mat-raised-button color="primary" routerLink="/hub">
+        <mat-icon>home</mat-icon>
         Back to Hub
+      </button>
+      <button mat-button routerLink="/gcp">
+        Retake Assessment
       </button>
     </mat-card-actions>
   </mat-card>
@@ -61,6 +159,7 @@
 <div class="no-results" *ngIf="!(recommendation$ | async)">
   <p>No recommendation available. Please complete the assessment first.</p>
   <button mat-raised-button color="primary" routerLink="/gcp">
+    <mat-icon>arrow_back</mat-icon>
     Start Assessment
   </button>
 </div>

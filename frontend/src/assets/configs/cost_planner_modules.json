@@ -616,6 +616,24 @@
               }
             },
             {
+              "key": "va_dependents",
+              "label": "Dependent Status",
+              "type": "select",
+              "options": [
+                {"value": "veteran_alone", "label": "Veteran alone"},
+                {"value": "with_spouse", "label": "Veteran with spouse"},
+                {"value": "with_spouse_one_child", "label": "Veteran with spouse + 1 child"},
+                {"value": "with_spouse_two_plus_children", "label": "Veteran with spouse + 2+ children"},
+                {"value": "children_only", "label": "Children only"}
+              ],
+              "default": "veteran_alone",
+              "help": "Choose the dependent household that best matches your VA award letter.",
+              "visible_if": {
+                "field": "has_va_disability",
+                "equals": true
+              }
+            },
+            {
               "key": "va_disability_monthly",
               "label": "Monthly VA Disability Payment",
               "type": "currency",
@@ -709,6 +727,7 @@
         "service_era": "string",
         "has_va_disability": "boolean",
         "va_disability_rating": "string",
+        "va_dependents": "string",
         "va_disability_monthly": "number",
         "receives_aid_attendance": "boolean",
         "aid_attendance_monthly": "number",

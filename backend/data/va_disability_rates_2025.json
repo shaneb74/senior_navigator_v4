@@ -1,0 +1,97 @@
+{
+  "effective_date": "2024-12-01",
+  "description": "2025 VA Disability Compensation Rates (Effective December 1, 2024)",
+  "source": "https://www.va.gov/disability/compensation-rates/veteran-rates/",
+  "rates": {
+    "0": {
+      "veteran_alone": 0.00,
+      "with_spouse": 0.00,
+      "with_spouse_one_child": 0.00,
+      "with_spouse_two_plus_children": 0.00,
+      "children_only": 0.00
+    },
+    "10": {
+      "veteran_alone": 175.51,
+      "with_spouse": 175.51,
+      "with_spouse_one_child": 175.51,
+      "with_spouse_two_plus_children": 175.51,
+      "children_only": 175.51
+    },
+    "20": {
+      "veteran_alone": 346.95,
+      "with_spouse": 346.95,
+      "with_spouse_one_child": 346.95,
+      "with_spouse_two_plus_children": 346.95,
+      "children_only": 346.95
+    },
+    "30": {
+      "veteran_alone": 537.42,
+      "with_spouse": 601.42,
+      "with_spouse_one_child": 651.42,
+      "with_spouse_two_plus_children": 697.42,
+      "children_only": 587.42
+    },
+    "40": {
+      "veteran_alone": 774.16,
+      "with_spouse": 859.16,
+      "with_spouse_one_child": 925.16,
+      "with_spouse_two_plus_children": 987.16,
+      "children_only": 840.16
+    },
+    "50": {
+      "veteran_alone": 1102.04,
+      "with_spouse": 1208.04,
+      "with_spouse_one_child": 1290.04,
+      "with_spouse_two_plus_children": 1368.04,
+      "children_only": 1184.04
+    },
+    "60": {
+      "veteran_alone": 1395.93,
+      "with_spouse": 1523.93,
+      "with_spouse_one_child": 1621.93,
+      "with_spouse_two_plus_children": 1715.93,
+      "children_only": 1477.93
+    },
+    "70": {
+      "veteran_alone": 1758.95,
+      "with_spouse": 1908.95,
+      "with_spouse_one_child": 2024.95,
+      "with_spouse_two_plus_children": 2136.95,
+      "children_only": 1874.95
+    },
+    "80": {
+      "veteran_alone": 2046.52,
+      "with_spouse": 2218.52,
+      "with_spouse_one_child": 2352.52,
+      "with_spouse_two_plus_children": 2482.52,
+      "children_only": 2180.52
+    },
+    "90": {
+      "veteran_alone": 2300.70,
+      "with_spouse": 2496.70,
+      "with_spouse_one_child": 2648.70,
+      "with_spouse_two_plus_children": 2796.70,
+      "children_only": 2452.70
+    },
+    "100": {
+      "veteran_alone": 3831.73,
+      "with_spouse": 4057.73,
+      "with_spouse_one_child": 4233.73,
+      "with_spouse_two_plus_children": 4405.73,
+      "children_only": 4007.73
+    }
+  },
+  "dependents_mapping": {
+    "none": "veteran_alone",
+    "spouse": "with_spouse",
+    "spouse_one_child": "with_spouse_one_child",
+    "spouse_two_plus_children": "with_spouse_two_plus_children",
+    "children_only": "children_only"
+  },
+  "notes": [
+    "Rates for 10% and 20% disability do not increase for dependents",
+    "Rates for 30% and above vary based on dependent status",
+    "Additional amounts apply for each child over 2, children over 18 in school, spouse receiving Aid & Attendance, and dependent parents",
+    "These are base rates - additional compensation may be available through Special Monthly Compensation (SMC)"
+  ]
+}

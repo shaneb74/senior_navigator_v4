@@ -8,7 +8,7 @@
     "display": {
       "title": "Find the Right Senior Care",
       "subtitle": "We'll match {NAME} to the best living options based on daily needs, safety, cognition, and more. Takes two minutes.",
-      "estimated_time": "≈2 min",
+      "estimated_time": "\u22482 min",
       "autosave": true,
       "progress_weight": 1.0
     },
@@ -24,8 +24,8 @@
         "can_pause": "You can pause anytime - {NAME_POS} progress is automatically saved"
       },
       "intro_message": {
-        "text": "✨ Navi: Let's find the senior care option that fits {NAME} best.",
-        "subtext": "You'll answer a few quick questions about {NAME_POS} daily needs, safety, and cognition. It takes about two minutes, and you can pause anytime—the plan saves automatically."
+        "text": "\u2728 Navi: Let's find the senior care option that fits {NAME} best.",
+        "subtext": "You'll answer a few quick questions about {NAME_POS} daily needs, safety, and cognition. It takes about two minutes, and you can pause anytime\u2014the plan saves automatically."
       }
     }
   },
@@ -37,18 +37,37 @@
       "content": [
         "This quick check helps match {NAME} with the right level of support. We'll ask about safety, day-to-day help, health, and who's involved in care. It takes about two minutes, saves automatically, and you can pause anytime.",
         "",
-        "Answer for {NAME} — the person who needs help — and we'll guide your next steps."
+        "Answer for {NAME} \u2014 the person who needs help \u2014 and we'll guide your next steps."
       ],
       "actions": [
-        { "label": "Get Started", "action": "next" },
-        { "label": "Back to Lobby", "action": "route", "value": "hub_lobby" }
+        {
+          "label": "Get Started",
+          "action": "next"
+        },
+        {
+          "label": "Back to Lobby",
+          "action": "route",
+          "value": "hub_lobby"
+        }
       ],
       "navi_guidance": {
         "section_purpose": "Set expectations for the guided plan.",
         "what_happens_next": "Answer a short series of questions about daily needs, safety, and cognition.",
         "time_estimate": "About two minutes.",
-        "encouragement": "Thanks for sharing these details—it helps me guide you to the right support."
-      }
+        "encouragement": "Thanks for sharing these details\u2014it helps me guide you to the right support."
+      },
+      "questions": [
+        {
+          "id": "care_recipient_name",
+          "type": "string",
+          "label": "Who are you answering for?",
+          "required": true,
+          "ui": {
+            "widget": "input",
+            "placeholder": "e.g., Mom (Evelyn)"
+          }
+        }
+      ]
     },
     {
       "id": "about_you",
@@ -57,7 +76,10 @@
       "navi_guidance": {
         "section_purpose": "Understand demographics and living context",
         "why_this_matters": "Age and living situation help us understand support networks and care accessibility",
-        "red_flags": ["Living alone + very isolated", "Living alone + 85+"],
+        "red_flags": [
+          "Living alone + very isolated",
+          "Living alone + 85+"
+        ],
         "encouragement": "These basic details help us tailor our recommendation"
       },
       "questions": [
@@ -69,12 +91,27 @@
           "required": true,
           "default": "under_65",
           "options": [
-            { "label": "Under 65", "value": "under_65" },
-            { "label": "65–74", "value": "65_74" },
-            { "label": "75–84", "value": "75_84" },
-            { "label": "85+", "value": "85_plus" }
+            {
+              "label": "Under 65",
+              "value": "under_65"
+            },
+            {
+              "label": "65\u201374",
+              "value": "65_74"
+            },
+            {
+              "label": "75\u201384",
+              "value": "75_84"
+            },
+            {
+              "label": "85+",
+              "value": "85_plus"
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "horizontal" },
+          "ui": {
+            "widget": "chip",
+            "orientation": "horizontal"
+          },
           "navi_guidance": {
             "why_asked": "Age influences care needs and options",
             "tip": "Higher age groups often need more support"
@@ -88,12 +125,30 @@
           "required": true,
           "default": "alone",
           "options": [
-            { "label": "Alone", "value": "alone" },
-            { "label": "With a spouse or partner", "value": "with_spouse_or_partner", "flags": ["has_partner"] },
-            { "label": "With family", "value": "with_family" },
-            { "label": "Assisted living", "value": "assisted_living" }
+            {
+              "label": "Alone",
+              "value": "alone"
+            },
+            {
+              "label": "With a spouse or partner",
+              "value": "with_spouse_or_partner",
+              "flags": [
+                "has_partner"
+              ]
+            },
+            {
+              "label": "With family",
+              "value": "with_family"
+            },
+            {
+              "label": "Assisted living",
+              "value": "assisted_living"
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "horizontal" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "horizontal"
+          }
         },
         {
           "id": "isolation",
@@ -103,11 +158,33 @@
           "required": true,
           "default": "accessible",
           "options": [
-            { "label": "No – easily accessible", "value": "accessible", "score": 0 },
-            { "label": "Somewhat isolated", "value": "somewhat", "score": 1, "flags": ["low_access"] },
-            { "label": "Very isolated", "value": "very", "score": 2, "flags": ["very_low_access", "geo_isolated"] }
+            {
+              "label": "No \u2013 easily accessible",
+              "value": "accessible",
+              "score": 0
+            },
+            {
+              "label": "Somewhat isolated",
+              "value": "somewhat",
+              "score": 1,
+              "flags": [
+                "low_access"
+              ]
+            },
+            {
+              "label": "Very isolated",
+              "value": "very",
+              "score": 2,
+              "flags": [
+                "very_low_access",
+                "geo_isolated"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "horizontal" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "horizontal"
+          }
         }
       ]
     },
@@ -118,7 +195,10 @@
       "navi_guidance": {
         "section_purpose": "Assess physical health, medication needs, and fall risks",
         "why_this_matters": "Medication complexity and mobility limitations are key indicators for care level",
-        "red_flags": ["Complex medications + multiple falls", "Bedbound + no support"],
+        "red_flags": [
+          "Complex medications + multiple falls",
+          "Bedbound + no support"
+        ],
         "encouragement": "These questions help us understand physical care needs"
       },
       "questions": [
@@ -129,12 +209,38 @@
           "label": "How complex is this person's medication routine?",
           "required": true,
           "options": [
-            { "label": "None", "value": "none", "score": 0 },
-            { "label": "Simple – a few meds, easy to manage", "value": "simple", "score": 1 },
-            { "label": "Moderate – daily meds, some complexity", "value": "moderate", "score": 2, "flags": ["moderate_dependence"] },
-            { "label": "Complex – many meds or caregiver-managed", "value": "complex", "score": 3, "flags": ["moderate_dependence", "chronic_present"] }
+            {
+              "label": "None",
+              "value": "none",
+              "score": 0
+            },
+            {
+              "label": "Simple \u2013 a few meds, easy to manage",
+              "value": "simple",
+              "score": 1
+            },
+            {
+              "label": "Moderate \u2013 daily meds, some complexity",
+              "value": "moderate",
+              "score": 2,
+              "flags": [
+                "moderate_dependence"
+              ]
+            },
+            {
+              "label": "Complex \u2013 many meds or caregiver-managed",
+              "value": "complex",
+              "score": 3,
+              "flags": [
+                "moderate_dependence",
+                "chronic_present"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "vertical" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "vertical"
+          }
         },
         {
           "id": "mobility",
@@ -143,12 +249,40 @@
           "label": "Mobility level?",
           "required": true,
           "options": [
-            { "label": "Walks independently", "value": "independent", "score": 0 },
-            { "label": "Uses cane or walker", "value": "walker", "score": 1, "flags": ["moderate_mobility"] },
-            { "label": "Uses wheelchair or scooter", "value": "wheelchair", "score": 2, "flags": ["high_mobility_dependence"] },
-            { "label": "Bed-bound or limited mobility", "value": "bedbound", "score": 3, "flags": ["high_mobility_dependence"] }
+            {
+              "label": "Walks independently",
+              "value": "independent",
+              "score": 0
+            },
+            {
+              "label": "Uses cane or walker",
+              "value": "walker",
+              "score": 1,
+              "flags": [
+                "moderate_mobility"
+              ]
+            },
+            {
+              "label": "Uses wheelchair or scooter",
+              "value": "wheelchair",
+              "score": 2,
+              "flags": [
+                "high_mobility_dependence"
+              ]
+            },
+            {
+              "label": "Bed-bound or limited mobility",
+              "value": "bedbound",
+              "score": 3,
+              "flags": [
+                "high_mobility_dependence"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "vertical" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "vertical"
+          }
         },
         {
           "id": "falls",
@@ -157,11 +291,33 @@
           "label": "Fall history?",
           "required": true,
           "options": [
-            { "label": "No falls in the past six months", "value": "none", "score": 0 },
-            { "label": "One fall", "value": "one", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Multiple falls", "value": "multiple", "score": 3, "flags": ["high_safety_concern", "falls_multiple"] }
+            {
+              "label": "No falls in the past six months",
+              "value": "none",
+              "score": 0
+            },
+            {
+              "label": "One fall",
+              "value": "one",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Multiple falls",
+              "value": "multiple",
+              "score": 3,
+              "flags": [
+                "high_safety_concern",
+                "falls_multiple"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "horizontal" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "horizontal"
+          }
         },
         {
           "id": "chronic_conditions",
@@ -170,34 +326,83 @@
           "label": "Chronic conditions (select all that apply):",
           "required": false,
           "options": [
-            { "label": "Diabetes", "value": "diabetes", "score": 1, "flags": ["chronic_present"] },
-            { "label": "Congestive heart failure (CHF)", "value": "chf", "score": 1, "flags": ["chronic_present"] },
-            { "label": "COPD / Respiratory disease", "value": "copd", "score": 1, "flags": ["chronic_present"] },
-            { "label": "Hypertension", "value": "hypertension", "score": 1, "flags": ["chronic_present"] },
-            { "label": "Arthritis", "value": "arthritis", "score": 1, "flags": ["chronic_present"] },
-            { "label": "Stroke or neurological condition", "value": "stroke", "score": 1, "flags": ["chronic_present"] },
-            { "label": "Parkinson's disease", "value": "parkinsons", "score": 1, "flags": ["chronic_present"] },
-            { "label": "Cancer", "value": "cancer", "score": 1, "flags": ["chronic_present"] },
-            { "label": "Other", "value": "other", "score": 1, "flags": ["chronic_present"] }
+            {
+              "label": "Diabetes",
+              "value": "diabetes",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            },
+            {
+              "label": "Congestive heart failure (CHF)",
+              "value": "chf",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            },
+            {
+              "label": "COPD / Respiratory disease",
+              "value": "copd",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            },
+            {
+              "label": "Hypertension",
+              "value": "hypertension",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            },
+            {
+              "label": "Arthritis",
+              "value": "arthritis",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            },
+            {
+              "label": "Stroke or neurological condition",
+              "value": "stroke",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            },
+            {
+              "label": "Parkinson's disease",
+              "value": "parkinsons",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            },
+            {
+              "label": "Cancer",
+              "value": "cancer",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            },
+            {
+              "label": "Other",
+              "value": "other",
+              "score": 1,
+              "flags": [
+                "chronic_present"
+              ]
+            }
           ],
           "ui": {
             "widget": "multi_chip",
             "allow_custom": true,
             "placeholder": "Select or add conditions",
-            "orientation": "vertical"
-          }
-        },
-        {
-          "id": "additional_conditions",
-          "type": "string",
-          "select": "multi",
-          "label": "List any additional chronic conditions (type and press Add)",
-          "required": false,
-          "options": [],
-          "ui": {
-            "widget": "multi_chip",
-            "allow_custom": true,
-            "placeholder": "Type and press Add to include conditions",
             "orientation": "vertical"
           }
         }
@@ -210,7 +415,11 @@
       "navi_guidance": {
         "section_purpose": "Evaluate cognitive function and mental health status",
         "why_this_matters": "Memory issues and mood changes determine if specialized care (like Memory Care) is needed",
-        "red_flags": ["Severe memory + wandering", "Severe memory + aggression", "Low mood + isolation"],
+        "red_flags": [
+          "Severe memory + wandering",
+          "Severe memory + aggression",
+          "Low mood + isolation"
+        ],
         "encouragement": "These are sensitive topics - answer honestly to get the right care recommendation",
         "support_message": "Remember: Cognitive decline is common and there are specialized care options designed to help"
       },
@@ -222,12 +431,41 @@
           "label": "Cognitive health or memory changes:",
           "required": true,
           "options": [
-            { "label": "No concerns", "value": "no_concerns", "score": 0 },
-            { "label": "Occasional forgetfulness", "value": "occasional", "score": 1, "flags": ["mild_cognitive_decline"] },
-            { "label": "Moderate memory or thinking issues", "value": "moderate", "score": 2, "flags": ["moderate_cognitive_decline"] },
-            { "label": "Severe memory issues or diagnosis like dementia or Alzheimer's", "value": "severe", "score": 3, "flags": ["severe_cognitive_risk", "cognitive_severe_any"] }
+            {
+              "label": "No concerns",
+              "value": "no_concerns",
+              "score": 0
+            },
+            {
+              "label": "Occasional forgetfulness",
+              "value": "occasional",
+              "score": 1,
+              "flags": [
+                "mild_cognitive_decline"
+              ]
+            },
+            {
+              "label": "Moderate memory or thinking issues",
+              "value": "moderate",
+              "score": 2,
+              "flags": [
+                "moderate_cognitive_decline"
+              ]
+            },
+            {
+              "label": "Severe memory issues or diagnosis like dementia or Alzheimer's",
+              "value": "severe",
+              "score": 3,
+              "flags": [
+                "severe_cognitive_risk",
+                "cognitive_severe_any"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "vertical" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "vertical"
+          }
         },
         {
           "id": "mood",
@@ -236,12 +474,41 @@
           "label": "Overall, how would you describe {NAME_POS} mood these days?",
           "required": true,
           "options": [
-            { "label": "Great – always positive", "value": "great", "score": 0 },
-            { "label": "Mostly good", "value": "mostly_good", "score": 1, "flags": ["moderate_risk"] },
-            { "label": "Okay – ups and downs", "value": "okay", "score": 1, "flags": ["moderate_risk"] },
-            { "label": "Low – feeling down a lot", "value": "low", "score": 2, "flags": ["high_risk", "mental_health_concern"] }
+            {
+              "label": "Great \u2013 always positive",
+              "value": "great",
+              "score": 0
+            },
+            {
+              "label": "Mostly good",
+              "value": "mostly_good",
+              "score": 1,
+              "flags": [
+                "moderate_risk"
+              ]
+            },
+            {
+              "label": "Okay \u2013 ups and downs",
+              "value": "okay",
+              "score": 1,
+              "flags": [
+                "moderate_risk"
+              ]
+            },
+            {
+              "label": "Low \u2013 feeling down a lot",
+              "value": "low",
+              "score": 2,
+              "flags": [
+                "high_risk",
+                "mental_health_concern"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "vertical" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "vertical"
+          }
         },
         {
           "id": "behaviors",
@@ -250,15 +517,78 @@
           "label": "Have there been any of these behaviors or concerns?",
           "required": false,
           "options": [
-            { "label": "Wandering", "value": "wandering", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Aggression", "value": "aggression", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Elopement / Exit-seeking", "value": "elopement", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Confusion or disorientation", "value": "confusion", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Sundowning", "value": "sundowning", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Repetitive questioning", "value": "repetitive", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Poor judgment", "value": "judgment", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Hoarding", "value": "hoarding", "score": 1, "flags": ["moderate_safety_concern"] },
-            { "label": "Sleep disturbances", "value": "sleep", "score": 1, "flags": ["moderate_safety_concern"] }
+            {
+              "label": "Wandering",
+              "value": "wandering",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Aggression",
+              "value": "aggression",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Elopement / Exit-seeking",
+              "value": "elopement",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Confusion or disorientation",
+              "value": "confusion",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Sundowning",
+              "value": "sundowning",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Repetitive questioning",
+              "value": "repetitive",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Poor judgment",
+              "value": "judgment",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Hoarding",
+              "value": "hoarding",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            },
+            {
+              "label": "Sleep disturbances",
+              "value": "sleep",
+              "score": 1,
+              "flags": [
+                "moderate_safety_concern"
+              ]
+            }
           ],
           "ui": {
             "widget": "multi_chip",
@@ -266,7 +596,13 @@
             "placeholder": "Select or add behaviors",
             "orientation": "vertical"
           },
-          "visible_if": { "key": "memory_changes", "in": ["moderate", "severe"] }
+          "visible_if": {
+            "key": "memory_changes",
+            "in": [
+              "moderate",
+              "severe"
+            ]
+          }
         },
         {
           "id": "cognitive_dx_confirm",
@@ -276,12 +612,36 @@
           "help": "This helps confirm Memory Care eligibility. If you're not sure yet, choose \"Not sure.\"",
           "required": false,
           "options": [
-            { "label": "Yes, diagnosed", "value": "dx_yes", "flags": ["memory_care_dx"] },
-            { "label": "No", "value": "dx_no", "flags": ["likely_mc_no_dx"] },
-            { "label": "Not sure", "value": "dx_unsure", "flags": ["likely_mc_no_dx"] }
+            {
+              "label": "Yes, diagnosed",
+              "value": "dx_yes",
+              "flags": [
+                "memory_care_dx"
+              ]
+            },
+            {
+              "label": "No",
+              "value": "dx_no",
+              "flags": [
+                "likely_mc_no_dx"
+              ]
+            },
+            {
+              "label": "Not sure",
+              "value": "dx_unsure",
+              "flags": [
+                "likely_mc_no_dx"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "vertical" },
-          "visible_if": { "key": "memory_changes", "eq": "severe" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "vertical"
+          },
+          "visible_if": {
+            "key": "memory_changes",
+            "eq": "severe"
+          }
         }
       ]
     },
@@ -292,7 +652,11 @@
       "navi_guidance": {
         "section_purpose": "Determine level of assistance needed for daily activities (ADLs and IADLs)",
         "why_this_matters": "The amount of help needed with daily tasks is the primary driver of care recommendations",
-        "red_flags": ["Needs help with 3+ ADLs", "24/7 support + no regular caregiver", "Full support + family caregiver stress"],
+        "red_flags": [
+          "Needs help with 3+ ADLs",
+          "24/7 support + no regular caregiver",
+          "Full support + family caregiver stress"
+        ],
         "encouragement": "Almost done! These final questions about daily activities are crucial for your recommendation",
         "context_note": "ADLs = bathing, dressing, eating, toileting. IADLs = cooking, finances, transportation"
       },
@@ -304,12 +668,40 @@
           "label": "How much help does {NAME} need with daily activities overall?",
           "required": true,
           "options": [
-            { "label": "None – fully independent", "value": "independent", "score": 0 },
-            { "label": "Occasional – some help with a few tasks", "value": "some_help", "score": 1, "flags": ["moderate_dependence"] },
-            { "label": "Regular – needs daily assistance", "value": "daily_help", "score": 2, "flags": ["moderate_dependence"] },
-            { "label": "Extensive – needs full-time support", "value": "full_support", "score": 3, "flags": ["high_dependence"] }
+            {
+              "label": "None \u2013 fully independent",
+              "value": "independent",
+              "score": 0
+            },
+            {
+              "label": "Occasional \u2013 some help with a few tasks",
+              "value": "some_help",
+              "score": 1,
+              "flags": [
+                "moderate_dependence"
+              ]
+            },
+            {
+              "label": "Regular \u2013 needs daily assistance",
+              "value": "daily_help",
+              "score": 2,
+              "flags": [
+                "moderate_dependence"
+              ]
+            },
+            {
+              "label": "Extensive \u2013 needs full-time support",
+              "value": "full_support",
+              "score": 3,
+              "flags": [
+                "high_dependence"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "vertical" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "vertical"
+          }
         },
         {
           "id": "badls",
@@ -318,13 +710,69 @@
           "label": "Which basic daily activities does this person need help with? (select all that apply)",
           "required": false,
           "options": [
-            { "label": "Bathing/Showering", "value": "bathing", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Dressing", "value": "dressing", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Eating", "value": "eating", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Toileting", "value": "toileting", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Transferring", "value": "transferring", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Personal Hygiene", "value": "hygiene", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Mobility", "value": "mobility", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] }
+            {
+              "label": "Bathing/Showering",
+              "value": "bathing",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Dressing",
+              "value": "dressing",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Eating",
+              "value": "eating",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Toileting",
+              "value": "toileting",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Transferring",
+              "value": "transferring",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Personal Hygiene",
+              "value": "hygiene",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Mobility",
+              "value": "mobility",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            }
           ],
           "ui": {
             "widget": "multi_chip",
@@ -340,13 +788,69 @@
           "label": "Which daily tasks does this person need help with? (select all that apply)",
           "required": false,
           "options": [
-            { "label": "Meal preparation", "value": "meal_prep", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Housekeeping", "value": "housekeeping", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Managing finances", "value": "finances", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Medication management", "value": "med_management", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Transportation", "value": "transportation", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Shopping", "value": "shopping", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] },
-            { "label": "Communication", "value": "communication", "score": 1, "flags": ["moderate_dependence", "veteran_aanda_risk"] }
+            {
+              "label": "Meal preparation",
+              "value": "meal_prep",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Housekeeping",
+              "value": "housekeeping",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Managing finances",
+              "value": "finances",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Medication management",
+              "value": "med_management",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Transportation",
+              "value": "transportation",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Shopping",
+              "value": "shopping",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            },
+            {
+              "label": "Communication",
+              "value": "communication",
+              "score": 1,
+              "flags": [
+                "moderate_dependence",
+                "veteran_aanda_risk"
+              ]
+            }
           ],
           "ui": {
             "widget": "multi_chip",
@@ -362,13 +866,42 @@
           "label": "How many hours per day of assistance does this person typically receive?",
           "required": true,
           "options": [
-            { "label": "Less than 1 hour", "value": "<1h", "score": 0, "flags": ["no_support"] },
-            { "label": "1–3 hours", "value": "1-3h", "score": 1, "flags": ["limited_support"] },
-            { "label": "4–8 hours", "value": "4-8h", "score": 2 },
-            { "label": "12–16 hours (around-the-clock with breaks)", "value": "12-16h", "score": 3 },
-            { "label": "24-hour support", "value": "24h", "score": 4 }
+            {
+              "label": "Less than 1 hour",
+              "value": "<1h",
+              "score": 0,
+              "flags": [
+                "no_support"
+              ]
+            },
+            {
+              "label": "1\u20133 hours",
+              "value": "1-3h",
+              "score": 1,
+              "flags": [
+                "limited_support"
+              ]
+            },
+            {
+              "label": "4\u20138 hours",
+              "value": "4-8h",
+              "score": 2
+            },
+            {
+              "label": "12\u201316 hours (around-the-clock with breaks)",
+              "value": "12-16h",
+              "score": 3
+            },
+            {
+              "label": "24-hour support",
+              "value": "24h",
+              "score": 4
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "vertical" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "vertical"
+          }
         },
         {
           "id": "primary_support",
@@ -377,12 +910,34 @@
           "label": "Who provides most of the support right now?",
           "required": true,
           "options": [
-            { "label": "Family/friends", "value": "family", "score": 1 },
-            { "label": "Paid caregiver", "value": "paid", "score": 2 },
-            { "label": "Community or agency", "value": "community", "score": 2 },
-            { "label": "No regular support", "value": "none", "score": 3, "flags": ["no_support"] }
+            {
+              "label": "Family/friends",
+              "value": "family",
+              "score": 1
+            },
+            {
+              "label": "Paid caregiver",
+              "value": "paid",
+              "score": 2
+            },
+            {
+              "label": "Community or agency",
+              "value": "community",
+              "score": 2
+            },
+            {
+              "label": "No regular support",
+              "value": "none",
+              "score": 3,
+              "flags": [
+                "no_support"
+              ]
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "horizontal" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "horizontal"
+          }
         }
       ]
     },
@@ -392,13 +947,22 @@
       "description": "Help us understand this person's openness to moving to a care facility.",
       "show_if": {
         "any": [
-          { "key": "gcp_recommendation_category", "equals": "assisted_living" },
-          { "key": "gcp_recommendation_category", "equals": "memory_care" },
-          { "key": "gcp_recommendation_category", "equals": "memory_care_high_acuity" }
+          {
+            "key": "gcp_recommendation_category",
+            "equals": "assisted_living"
+          },
+          {
+            "key": "gcp_recommendation_category",
+            "equals": "memory_care"
+          },
+          {
+            "key": "gcp_recommendation_category",
+            "equals": "memory_care_high_acuity"
+          }
         ]
       },
       "navi_guidance": {
-        "section_purpose": "Almost there — one more question before your personalized recommendation.",
+        "section_purpose": "Almost there \u2014 one more question before your personalized recommendation.",
         "why_this_matters": "Willingness to move affects care planning and family dynamics",
         "encouragement": "There's no right or wrong answer - just be honest about comfort level with change"
       },
@@ -412,12 +976,31 @@
           "required": true,
           "default": "2",
           "options": [
-            { "label": "1 – Strong preference to stay home", "value": "1", "score": 0 },
-            { "label": "2 – Uncertain or need more information", "value": "2", "score": 0 },
-            { "label": "3 – Open if it improves my care plan", "value": "3", "score": 0 },
-            { "label": "4 – Comfortable with the idea of moving", "value": "4", "score": 0 }
+            {
+              "label": "1 \u2013 Strong preference to stay home",
+              "value": "1",
+              "score": 0
+            },
+            {
+              "label": "2 \u2013 Uncertain or need more information",
+              "value": "2",
+              "score": 0
+            },
+            {
+              "label": "3 \u2013 Open if it improves my care plan",
+              "value": "3",
+              "score": 0
+            },
+            {
+              "label": "4 \u2013 Comfortable with the idea of moving",
+              "value": "4",
+              "score": 0
+            }
           ],
-          "ui": { "widget": "chip", "orientation": "horizontal" }
+          "ui": {
+            "widget": "chip",
+            "orientation": "horizontal"
+          }
         }
       ]
     },
@@ -428,7 +1011,7 @@
       "navi_guidance": {
         "section_purpose": "Great job! Based on your answers, here's what I recommend.",
         "what_you_see": "Care tier (Independent, In-Home, Assisted Living, or Memory Care), rationale, and risk flags",
-        "next_steps": "Review recommendation → Calculate costs → Talk to advisor",
+        "next_steps": "Review recommendation \u2192 Calculate costs \u2192 Talk to advisor",
         "encouragement": "",
         "confidence_explanation": "Confidence score shows how complete your assessment was. Higher is better.",
         "what_to_do_with_this": "Use this recommendation to explore costs, find facilities, and discuss options with family"
@@ -447,9 +1030,21 @@
         ]
       },
       "actions": [
-        { "label": "Next: Cost & Options", "action": "cost_planner_handoff", "value": "cost_planner" },
-        { "label": "Return to Care Hub", "action": "route", "value": "care_hub" },
-        { "label": "Talk to an Advisor", "action": "route", "value": "advisor" }
+        {
+          "label": "Next: Cost & Options",
+          "action": "cost_planner_handoff",
+          "value": "cost_planner"
+        },
+        {
+          "label": "Return to Care Hub",
+          "action": "route",
+          "value": "care_hub"
+        },
+        {
+          "label": "Talk to an Advisor",
+          "action": "route",
+          "value": "advisor"
+        }
       ]
     }
   ]

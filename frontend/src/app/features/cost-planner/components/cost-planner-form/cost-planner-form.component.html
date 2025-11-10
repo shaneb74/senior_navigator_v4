@@ -1,0 +1,61 @@
+<div class="cost-planner-container" *ngIf="config$ | async as config">
+  <div class="cp-header">
+    <h1>{{ renderText(config.module.display.title) }}</h1>
+    <p class="subtitle">{{ renderText(config.module.display.subtitle) }}</p>
+    <mat-progress-bar mode="determinate" [value]="progress$ | async"></mat-progress-bar>
+  </div>
+
+  <mat-card class="section-card" *ngIf="currentSection$ | async as section">
+    <mat-card-header>
+      <mat-card-title>{{ renderText(section.title) }}</mat-card-title>
+      <mat-card-subtitle *ngIf="section.description">
+        {{ renderText(section.description) }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="form-wrapper" *ngIf="currentSectionFields.length > 0">
+        <form [formGroup]="form">
+          <formly-form
+            [form]="form"
+            [fields]="currentSectionFields"
+            [model]="model"
+            [options]="options">
+          </formly-form>
+        </form>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button (click)="onPrevious()" [disabled]="!(canGoPrevious$ | async)">
+        <mat-icon>arrow_back</mat-icon>
+        Previous
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onNext()"
+        [disabled]="!(canGoNext$ | async) || !form.valid"
+        *ngIf="!(isLastSection$ | async)">
+        Next
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSubmit()"
+        [disabled]="!form.valid || (submitting$ | async)"
+        *ngIf="isLastSection$ | async">
+        <mat-icon>check_circle</mat-icon>
+        {{ (submitting$ | async) ? 'Calculating...' : 'View Cost Plan' }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+<div class="loading-state" *ngIf="!(config$ | async)">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  <p>Preparing modules...</p>
+</div>

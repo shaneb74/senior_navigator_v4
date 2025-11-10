@@ -1,0 +1,110 @@
+
+<mat-card class="quick-estimate-card">
+  <mat-card-header>
+    <mat-card-title>Quick Cost Estimate</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="form">
+      <mat-form-field appearance="outline">
+        <mat-label>Monthly budget</mat-label>
+        <input matInput type="number" formControlName="monthlyBudget" min="0" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Focus care level</mat-label>
+        <mat-select formControlName="careLevel">
+          <mat-option value="in_home">In-Home Support</mat-option>
+          <mat-option value="assisted_living">Assisted Living</mat-option>
+          <mat-option value="memory_care">Memory Care</mat-option>
+          <mat-option value="memory_care_high_acuity">Memory Care (High Acuity)</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <p class="home-carry-hint">
+      Household costs included from the intro step: <strong>{{ homeCarry | currency }}/mo</strong>
+    </p>
+
+    <div class="estimate-summary">
+      <div class="summary-card">
+        <span class="label">Base cost</span>
+        <strong>{{ estimate.baseCost | currency }}</strong>
+      </div>
+      <div class="summary-card">
+        <span class="label">Flag modifiers</span>
+        <strong>{{ estimate.modifierTotal | currency }}</strong>
+        <small *ngIf="estimate.modifierNotes.length">
+          {{ estimate.modifierNotes.join(', ') }}
+        </small>
+      </div>
+      <div class="summary-card total">
+        <span class="label">Total care cost</span>
+        <strong>{{ estimate.careCost | currency }}</strong>
+      </div>
+      <div class="summary-card">
+        <span class="label">Gap vs budget</span>
+        <strong [class.positive]="estimate.gap <= 0" [class.negative]="estimate.gap > 0">
+          {{ estimate.gap | currency }}
+        </strong>
+      </div>
+    </div>
+
+    <section class="care-hours" *ngIf="careHoursPerDay">
+      <h3>Care hours recommendation</h3>
+      <p>
+        <strong>{{ careHoursPerDay }} hrs/day</strong>
+        <span class="care-hours-copy">{{ careHoursSummary }}</span>
+      </p>
+      <p class="muted">
+        These hours drive the cost modifiers we apply to in-home and community scenarios.
+      </p>
+    </section>
+
+    <section class="comparison-grid" *ngIf="comparisons.length">
+      <article
+        class="comparison-card"
+        *ngFor="let comparison of comparisons"
+        [class.selected]="comparison.tier === selectedTier"
+      >
+        <header>
+          {{ comparison.label }}
+          <span class="badge" *ngIf="comparison.tier === selectedTier">Focused</span>
+        </header>
+        <div class="cost">{{ formatCurrency(comparison.totalCost) }}</div>
+        <div class="gap" [class.positive]="comparison.gap <= 0" [class.negative]="comparison.gap > 0">
+          Gap vs budget: {{ formatCurrency(comparison.gap) }}
+        </div>
+        <div class="breakdown">
+          <div>
+            <span>Base</span>
+            <strong>{{ formatCurrency(comparison.baseCost) }}</strong>
+          </div>
+          <div *ngIf="comparison.modifierTotal">
+            <span>Modifiers</span>
+            <strong>+{{ formatCurrency(comparison.modifierTotal) }}</strong>
+          </div>
+          <div *ngIf="comparison.householdCost">
+            <span>Household</span>
+            <strong>+{{ formatCurrency(comparison.householdCost) }}</strong>
+          </div>
+        </div>
+        <ul class="modifier-list" *ngIf="comparison.modifierBreakdown.length">
+          <li *ngFor="let mod of comparison.modifierBreakdown">
+            {{ mod.label }} (+{{ formatCurrency(mod.amount) }})
+          </li>
+        </ul>
+        <p *ngIf="comparison.includesHome" class="note">
+          Includes household expenses ({{ formatCurrency(homeCarry) }}/mo)
+        </p>
+        <button mat-stroked-button color="primary" (click)="focusScenario(comparison.tier)">
+          View scenario
+        </button>
+      </article>
+    </section>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="continueToAssessment()">
+      Continue to Quick Questions
+    </button>
+  </mat-card-actions>
+</mat-card>
