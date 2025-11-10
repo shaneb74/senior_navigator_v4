@@ -1,14 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
-import { FormlyMaterialModule } from '@ngx-formly/material';
-import { FormlyMatInputModule } from '@ngx-formly/material/input';
-import { FormlyMatSelectModule } from '@ngx-formly/material/select';
-import { FormlyMatRadioModule } from '@ngx-formly/material/radio';
-import { FormlyMatCheckboxModule } from '@ngx-formly/material/checkbox';
-import { FormlyMatTextAreaModule } from '@ngx-formly/material/textarea';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,10 +12,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatOptionModule } from '@angular/material/core';
 
 import * as CostPlannerActions from '../../store/cost-planner.actions';
 import * as CostPlannerSelectors from '../../store/cost-planner.selectors';
-import { ModuleConfig, Section } from '../../../../core/services/module-config.service';
+import { ModuleConfig, Question, Section } from '../../../../core/services/module-config.service';
 import { ModuleConfigService } from '../../../../core/services/module-config.service';
 import { UserContextService } from '../../../../core/services/user-context.service';
 import { getVaDisabilityAmount } from '../../constants/va-disability-rates';
@@ -35,13 +31,6 @@ import { getVaDisabilityAmount } from '../../constants/va-disability-rates';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormlyModule,
-    FormlyMaterialModule,
-    FormlyMatInputModule,
-    FormlyMatSelectModule,
-    FormlyMatRadioModule,
-    FormlyMatCheckboxModule,
-    FormlyMatTextAreaModule,
     MatButtonModule,
     MatCardModule,
     MatProgressBarModule,
@@ -50,6 +39,9 @@ import { getVaDisabilityAmount } from '../../constants/va-disability-rates';
     MatSelectModule,
     MatCheckboxModule,
     MatRadioModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatOptionModule,
   ],
 })
 export class CostPlannerFormComponent implements OnInit, OnDestroy {
@@ -57,6 +49,8 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
   private latestConfig: ModuleConfig | null = null;
   private contextName = '';
   private currentSectionRef: Section | null = null;
+  private modelInitialized = false;
+  private suppressValueSync = false;
 
   config$: Observable<ModuleConfig | null>;
   currentSection$: Observable<Section | null>;
@@ -69,9 +63,7 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
 
   form = new FormGroup({});
   model: any = {};
-  options: FormlyFormOptions = {};
-  fields: FormlyFieldConfig[] = [];
-  currentSectionFields: FormlyFieldConfig[] = [];
+  currentQuestions: Question[] = [];
 
   constructor(
     private store: Store,
@@ -102,7 +94,8 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
       .subscribe((config) => {
         if (config) {
           this.latestConfig = config;
-          this.buildDynamicFields();
+          this.initializeFormControls(config);
+          this.updateCurrentSectionFields(this.currentSectionRef ?? config.sections[0]);
         }
       });
 
@@ -110,7 +103,24 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
       .select(CostPlannerSelectors.selectFormData)
       .pipe(takeUntil(this.destroy$))
       .subscribe((formData) => {
+        if (!formData) {
+          return;
+        }
+
         this.model = { ...formData };
+
+        if (!this.modelInitialized) {
+          this.modelInitialized = true;
+        }
+
+        Object.entries(formData).forEach(([key, value]) => {
+          const control = this.form.get(key);
+          if (control && control.value !== value) {
+            this.suppressValueSync = true;
+            control.patchValue(value, { emitEvent: false });
+            this.suppressValueSync = false;
+          }
+        });
       });
 
     this.currentSection$
@@ -125,7 +135,7 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
     this.form.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((value) => {
-        if (!value) {
+        if (!value || this.suppressValueSync) {
           return;
         }
 
@@ -134,19 +144,20 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
         if (formValue['care_recipient_name'] && formValue['care_recipient_name'] !== this.contextName) {
           this.contextName = formValue['care_recipient_name'];
           this.userContext.updateContext({ care_recipient_name: this.contextName });
-          this.buildDynamicFields();
+          this.initializeFormControls(this.latestConfig);
+          this.updateCurrentSectionFields(this.currentSectionRef);
         }
 
-        let nextModel = { ...this.model };
-        let modelChanged = false;
+        const changedEntries = Object.entries(formValue).filter(
+          ([key, fieldValue]) => this.model[key] !== fieldValue
+        );
 
-        Object.keys(formValue).forEach((key) => {
-          const fieldValue = formValue[key];
-          if (nextModel[key] === fieldValue) {
-            return;
-          }
-          nextModel = { ...nextModel, [key]: fieldValue };
-          modelChanged = true;
+        if (changedEntries.length === 0) {
+          return;
+        }
+
+        changedEntries.forEach(([key, fieldValue]) => {
+          this.model[key] = fieldValue;
           this.store.dispatch(
             CostPlannerActions.updateFormValue({
               field: key,
@@ -155,11 +166,7 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
           );
         });
 
-        if (modelChanged) {
-          this.model = nextModel;
-        }
-
-        this.applyDerivedFieldUpdates();
+        this.applyDerivedFieldUpdates(formValue);
       });
 
     this.submitError$
@@ -214,42 +221,79 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
     return this.moduleConfigService.replacePlaceholders(text, { name: this.contextName });
   }
 
-  private buildDynamicFields(): void {
-    if (!this.latestConfig) {
+  private initializeFormControls(config: ModuleConfig | null): void {
+    if (!config) {
       return;
     }
-    const context = this.contextName ? { name: this.contextName } : undefined;
-    this.fields = this.moduleConfigService.convertToFormlyFields(this.latestConfig, context);
-    if (this.currentSectionRef) {
-      this.updateCurrentSectionFields(this.currentSectionRef);
-    }
-    if (this.contextName && !this.model.care_recipient_name) {
-      this.model = {
-        ...this.model,
-        care_recipient_name: this.contextName,
-      };
+
+    config.sections.forEach((section) => {
+      (section.questions || []).forEach((question) => {
+        if (this.form.get(question.id)) {
+          return;
+        }
+
+        const initialValue =
+          this.model[question.id] ??
+          question.default ??
+          (this.isMultiSelect(question) ? [] : question.type === 'boolean' ? false : '');
+
+        const validators = [];
+        if (question.required) {
+          validators.push(Validators.required);
+        }
+        if (question.type === 'number') {
+          if (question.ui?.min !== undefined) {
+            validators.push(Validators.min(question.ui.min));
+          }
+          if (question.ui?.max !== undefined) {
+            validators.push(Validators.max(question.ui.max));
+          }
+        }
+
+        this.form.addControl(question.id, new FormControl(initialValue, validators));
+      });
+    });
+
+    const careControl = this.form.get('care_recipient_name');
+    if (this.contextName && careControl && !careControl.value) {
+      careControl.patchValue(this.contextName, { emitEvent: false });
+      this.model['care_recipient_name'] = this.contextName;
     }
   }
 
-  private updateCurrentSectionFields(section: Section): void {
-    if (!section.questions) {
-      this.currentSectionFields = [];
+  private updateCurrentSectionFields(section: Section | null): void {
+    if (!section) {
+      this.currentQuestions = [];
       return;
     }
-    const context = this.contextName ? { name: this.contextName } : undefined;
-    this.currentSectionFields = section.questions
-      .map((q) => this.moduleConfigService.convertQuestionToFormlyField(q, context))
-      .filter((field): field is FormlyFieldConfig => !!field);
+    this.currentSectionRef = section;
+    this.currentQuestions = section.questions || [];
   }
 
-  private applyDerivedFieldUpdates(): void {
-    this.syncVaDisabilityAmount();
-    this.syncVaBenefitSummary();
-    this.syncAssetAggregates();
+  private applyDerivedFieldUpdates(source?: Record<string, any>): void {
+    const snapshot = source ?? this.model;
+    this.syncVaDisabilityAmount(snapshot);
+    this.syncVaBenefitSummary(snapshot);
+    this.syncAssetAggregates(snapshot);
   }
 
-  private syncVaDisabilityAmount(): void {
-    const status = this.model.has_va_disability;
+  private normalizeVaDependentKey(value: any): string | null {
+    if (!value) {
+      return null;
+    }
+    const map: Record<string, string> = {
+      veteran_with_spouse: 'with_spouse',
+      spouse_of_veteran: 'with_spouse',
+      surviving_spouse: 'veteran_alone',
+      veteran_alone: 'veteran_alone',
+      veteran_with_spouse_one_child: 'with_spouse_one_child',
+      veteran_with_spouse_two_plus_children: 'with_spouse_two_plus_children',
+    };
+    return map[value] || value;
+  }
+
+  private syncVaDisabilityAmount(data: Record<string, any>): void {
+    const status = data['has_va_disability'];
     const shouldAutofill =
       status === true ||
       status === 'yes' ||
@@ -257,11 +301,28 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
       status === 'receiving';
 
     if (!shouldAutofill) {
+      this.updateDerivedField('va_disability_monthly', this.toNumber(data['va_disability_monthly'] || 0));
       return;
     }
 
-    const rating = this.model.va_disability_rating;
-    const dependents = this.model.va_dependents || this.model.veteran_relationship;
+    const rating = data['va_disability_rating'];
+    const dependents =
+      this.normalizeVaDependentKey(data['va_dependents']) ||
+      this.normalizeVaDependentKey(data['veteran_relationship']);
+
+    if (!rating || !dependents) {
+      // If we have rating but no dependents, default to veteran_alone
+      if (rating && !dependents) {
+        const amount = getVaDisabilityAmount(rating, 'veteran_alone');
+        this.updateDerivedField('va_disability_monthly', amount);
+        const control = this.form.get('va_disability_monthly');
+        if (control && control.value !== amount) {
+          (control as any).patchValue(amount, { emitEvent: false });
+        }
+      }
+      return;
+    }
+
     const amount = getVaDisabilityAmount(rating, dependents);
 
     this.updateDerivedField('va_disability_monthly', amount);
@@ -272,39 +333,39 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  private syncVaBenefitSummary(): void {
+  private syncVaBenefitSummary(data: Record<string, any>): void {
     const totalVa =
-      this.toNumber(this.model.va_disability_monthly) + this.toNumber(this.model.aid_attendance_monthly);
+      this.toNumber(data['va_disability_monthly']) + this.toNumber(data['aid_attendance_monthly']);
     this.updateDerivedField('va_benefit_amount', totalVa);
 
     const status = this.deriveVaBenefitStatus();
     this.updateDerivedField('va_benefit_status', status);
   }
 
-  private syncAssetAggregates(): void {
+  private syncAssetAggregates(data: Record<string, any>): void {
     const liquid =
-      this.toNumber(this.model.checking_savings) + this.toNumber(this.model.cds_money_market);
+      this.toNumber(data['checking_savings']) + this.toNumber(data['cds_money_market']);
     this.updateDerivedField('liquid_assets', liquid);
 
     const investments =
-      this.toNumber(this.model.stocks_bonds) +
-      this.toNumber(this.model.mutual_funds) +
-      this.toNumber(this.model.ira_traditional) +
-      this.toNumber(this.model.ira_roth) +
-      this.toNumber(this.model.k401_403b) +
-      this.toNumber(this.model.other_retirement);
+      this.toNumber(data['stocks_bonds']) +
+      this.toNumber(data['mutual_funds']) +
+      this.toNumber(data['ira_traditional']) +
+      this.toNumber(data['ira_roth']) +
+      this.toNumber(data['k401_403b']) +
+      this.toNumber(data['other_retirement']);
     this.updateDerivedField('investment_assets', investments);
 
     const homeEquity = Math.max(
-      this.toNumber(this.model.primary_residence_value) -
-        this.toNumber(this.model.primary_residence_mortgage),
+      this.toNumber(data['primary_residence_value']) -
+        this.toNumber(data['primary_residence_mortgage']),
       0
     );
-    const realEstate = homeEquity + this.toNumber(this.model.investment_property);
+    const realEstate = homeEquity + this.toNumber(data['investment_property']);
     this.updateDerivedField('real_estate_assets', realEstate);
 
     const otherAssets =
-      this.toNumber(this.model.business_value) + this.toNumber(this.model.other_assets_value);
+      this.toNumber(data['business_value']) + this.toNumber(data['other_assets_value']);
     this.updateDerivedField('other_assets', otherAssets);
   }
 
@@ -371,5 +432,76 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
     };
 
     return payload;
+  }
+
+  isCurrentSectionValid(): boolean {
+    if (!this.currentQuestions?.length) {
+      return true;
+    }
+    return this.currentQuestions
+      .filter((question) => question?.required && this.isQuestionVisible(question))
+      .every((question) => this.form.get(question.id)?.valid);
+  }
+
+  isQuestionVisible(question: Question): boolean {
+    const condition = question?.visible_if;
+    if (!condition) {
+      return true;
+    }
+    const value = this.form.value?.[condition.key];
+    if (condition.eq !== undefined) {
+      return this.compareValue(value, condition.eq);
+    }
+    if (condition.neq !== undefined) {
+      return !this.compareValue(value, condition.neq);
+    }
+    if (condition.in) {
+      if (Array.isArray(value)) {
+        return value.some((v) => condition.in!.includes(v));
+      }
+      return condition.in.includes(value);
+    }
+    return value !== null && value !== undefined && value !== '';
+  }
+
+  private compareValue(value: any, expected: any): boolean {
+    if (Array.isArray(value)) {
+      return value.includes(expected);
+    }
+    return value === expected;
+  }
+
+  getControlType(question: Question): 'text' | 'select' | 'radio' | 'checkbox' | 'textarea' {
+    if (question.type === 'boolean') {
+      return 'checkbox';
+    }
+    if (question.ui?.widget === 'textarea') {
+      return 'textarea';
+    }
+    if (question.options?.length) {
+      if (question.ui?.widget === 'radio') {
+        return 'radio';
+      }
+      return 'select';
+    }
+    return 'text';
+  }
+
+  isMultiSelect(question: Question): boolean {
+    const selection = this.normalizeSelection(question.select);
+    if (selection) {
+      return selection === 'multi';
+    }
+    return Array.isArray(question.default);
+  }
+
+  private normalizeSelection(value: 'single' | 'multiple' | 'multi' | undefined): 'single' | 'multi' | undefined {
+    if (!value) {
+      return undefined;
+    }
+    if (value === 'multiple') {
+      return 'multi';
+    }
+    return value;
   }
 }

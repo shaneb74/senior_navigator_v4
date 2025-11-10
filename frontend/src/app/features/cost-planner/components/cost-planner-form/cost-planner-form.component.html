@@ -14,16 +14,70 @@
     </mat-card-header>
 
     <mat-card-content>
-      <div class="form-wrapper" *ngIf="currentSectionFields.length > 0">
-        <form [formGroup]="form">
-          <formly-form
-            [form]="form"
-            [fields]="currentSectionFields"
-            [model]="model"
-            [options]="options">
-          </formly-form>
-        </form>
-      </div>
+      <form [formGroup]="form" class="form-wrapper" *ngIf="currentQuestions?.length">
+        <div class="question" *ngFor="let question of currentQuestions" [ngClass]="question.type" [hidden]="!isQuestionVisible(question)">
+          <ng-container [ngSwitch]="getControlType(question)">
+            <mat-form-field appearance="outline" *ngSwitchCase="'text'">
+              <mat-label>{{ renderText(question.label) }}</mat-label>
+              <span matPrefix *ngIf="question.ui?.prefix">{{ question.ui.prefix }}&nbsp;</span>
+              <input
+                matInput
+                [type]="question.type === 'number' ? 'number' : 'text'"
+                [formControlName]="question.id"
+                [placeholder]="question.ui?.placeholder || question.description"
+                [min]="question.ui?.min"
+                [max]="question.ui?.max"
+                [step]="question.ui?.step"
+              />
+              <mat-hint *ngIf="question.description">{{ renderText(question.description) }}</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" *ngSwitchCase="'textarea'">
+              <mat-label>{{ renderText(question.label) }}</mat-label>
+              <textarea
+                matInput
+                [rows]="question.ui?.rows || 3"
+                [formControlName]="question.id"
+                [placeholder]="question.ui?.placeholder || question.description"
+              ></textarea>
+              <mat-hint *ngIf="question.description">{{ renderText(question.description) }}</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" *ngSwitchCase="'select'">
+              <mat-label>{{ renderText(question.label) }}</mat-label>
+              <mat-select
+                [formControlName]="question.id"
+                [multiple]="isMultiSelect(question)"
+              >
+                <mat-option *ngFor="let opt of question.options" [value]="opt.value">
+                  {{ renderText(opt.label) }}
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="question.description">{{ renderText(question.description) }}</mat-hint>
+            </mat-form-field>
+
+            <mat-radio-group
+              *ngSwitchCase="'radio'"
+              [formControlName]="question.id"
+              class="radio-group"
+            >
+              <label class="question-label">{{ renderText(question.label) }}</label>
+              <mat-radio-button *ngFor="let opt of question.options" [value]="opt.value">
+                {{ renderText(opt.label) }}
+              </mat-radio-button>
+              <p class="question-hint" *ngIf="question.description">{{ renderText(question.description) }}</p>
+            </mat-radio-group>
+
+            <mat-checkbox
+              *ngSwitchCase="'checkbox'"
+              [formControlName]="question.id"
+            >
+              {{ renderText(question.label) }}
+              <span class="question-hint" *ngIf="question.description">{{ renderText(question.description) }}</span>
+            </mat-checkbox>
+          </ng-container>
+        </div>
+      </form>
     </mat-card-content>
 
     <mat-card-actions align="end">
@@ -36,7 +90,7 @@
         mat-raised-button
         color="primary"
         (click)="onNext()"
-        [disabled]="!(canGoNext$ | async) || !form.valid"
+        [disabled]="!(canGoNext$ | async) || !isCurrentSectionValid()"
         *ngIf="!(isLastSection$ | async)">
         Next
         <mat-icon>arrow_forward</mat-icon>

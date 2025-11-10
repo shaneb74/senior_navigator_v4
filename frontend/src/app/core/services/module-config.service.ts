@@ -170,22 +170,10 @@ export class ModuleConfigService {
 
       // Add section wrapper if we have fields
       if (sectionFields.length > 0) {
-        const header: FormlyFieldConfig[] = [];
-        if (section.title || section.description) {
-          header.push({
-            template: `
-              <div class="form-section-header">
-                ${section.title ? `<h3>${context?.name ? this.replacePlaceholders(section.title, context) : section.title}</h3>` : ''}
-                ${section.description ? `<p>${context?.name ? this.replacePlaceholders(section.description, context) : section.description}</p>` : ''}
-              </div>
-            `,
-          });
-        }
-
         fields.push({
           key: section.id,
           fieldGroupClassName: 'form-section',
-          fieldGroup: [...header, ...sectionFields],
+          fieldGroup: [...sectionFields],
         });
       }
     }
