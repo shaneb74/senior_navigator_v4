@@ -242,11 +242,11 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
           validators.push(Validators.required);
         }
         if (question.type === 'number') {
-          if (question.ui?.min !== undefined) {
-            validators.push(Validators.min(question.ui.min));
+          if (question.ui?.['min'] !== undefined) {
+            validators.push(Validators.min(question.ui['min']));
           }
-          if (question.ui?.max !== undefined) {
-            validators.push(Validators.max(question.ui.max));
+          if (question.ui?.['max'] !== undefined) {
+            validators.push(Validators.max(question.ui['max']));
           }
         }
 
@@ -256,7 +256,7 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
 
     const careControl = this.form.get('care_recipient_name');
     if (this.contextName && careControl && !careControl.value) {
-      careControl.patchValue(this.contextName, { emitEvent: false });
+      (careControl as any).patchValue(this.contextName, { emitEvent: false });
       this.model['care_recipient_name'] = this.contextName;
     }
   }
@@ -448,7 +448,8 @@ export class CostPlannerFormComponent implements OnInit, OnDestroy {
     if (!condition) {
       return true;
     }
-    const value = this.form.value?.[condition.key];
+    const formValue = this.form.value as Record<string, any>;
+    const value = formValue?.[condition.key];
     if (condition.eq !== undefined) {
       return this.compareValue(value, condition.eq);
     }

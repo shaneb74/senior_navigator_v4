@@ -19,15 +19,15 @@
           <ng-container [ngSwitch]="getControlType(question)">
             <mat-form-field appearance="outline" *ngSwitchCase="'text'">
               <mat-label>{{ renderText(question.label) }}</mat-label>
-              <span matPrefix *ngIf="question.ui?.prefix">{{ question.ui.prefix }}&nbsp;</span>
+              <span matPrefix *ngIf="question.ui?.['prefix']">{{ question.ui['prefix'] }}&nbsp;</span>
               <input
                 matInput
                 [type]="question.type === 'number' ? 'number' : 'text'"
                 [formControlName]="question.id"
-                [placeholder]="question.ui?.placeholder || question.description"
-                [min]="question.ui?.min"
-                [max]="question.ui?.max"
-                [step]="question.ui?.step"
+                [placeholder]="question.ui?.['placeholder'] || question.description"
+                [min]="question.ui?.['min']"
+                [max]="question.ui?.['max']"
+                [step]="question.ui?.['step']"
               />
               <mat-hint *ngIf="question.description">{{ renderText(question.description) }}</mat-hint>
             </mat-form-field>
@@ -36,9 +36,9 @@
               <mat-label>{{ renderText(question.label) }}</mat-label>
               <textarea
                 matInput
-                [rows]="question.ui?.rows || 3"
+                [rows]="question.ui?.['rows'] || 3"
                 [formControlName]="question.id"
-                [placeholder]="question.ui?.placeholder || question.description"
+                [placeholder]="question.ui?.['placeholder'] || question.description"
               ></textarea>
               <mat-hint *ngIf="question.description">{{ renderText(question.description) }}</mat-hint>
             </mat-form-field>
