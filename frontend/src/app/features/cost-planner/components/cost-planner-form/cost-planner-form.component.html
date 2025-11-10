@@ -19,7 +19,7 @@
           <ng-container [ngSwitch]="getControlType(question)">
             <mat-form-field appearance="outline" *ngSwitchCase="'text'">
               <mat-label>{{ renderText(question.label) }}</mat-label>
-              <span matPrefix *ngIf="question.ui?.['prefix']">{{ question.ui['prefix'] }}&nbsp;</span>
+              <span matPrefix *ngIf="question.ui?.['prefix']">{{ question.ui?.['prefix'] }}&nbsp;</span>
               <input
                 matInput
                 [type]="question.type === 'number' ? 'number' : 'text'"
